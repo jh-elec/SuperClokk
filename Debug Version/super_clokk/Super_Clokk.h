@@ -200,7 +200,7 @@ uint8_t incDec(uint8_t  Value , uint8_t ValueMax);
 /*	Parameter	: BCD Value (z.B 0x04)
 *	Returns		: Decimal
 */
-uint8_t bcdToDec(uint8_t value);
+uint8_t rtcBcdToDec(uint8_t value);
 
 /* scroll a info string over the display about the "Super_Clokk" */
 /*	Parameter	: none

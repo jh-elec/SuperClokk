@@ -15,7 +15,7 @@
 
 
 #define VERSION_MAJOR  	1
-#define VERSION_MINOR	1
+#define VERSION_MINOR	2
 
 #if (VERSION_MAJOR >= '0' && VERSION_MAJOR <= '9')
 	static char verMajor = VERSION_MAJOR;

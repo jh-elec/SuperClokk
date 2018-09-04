@@ -230,7 +230,7 @@ uint8_t reboot(void)
 
 void scrollDate					( rx8564_t *d, uint8_t speed)
 {	
-	char date[40] = "";
+	char date[60] = "";
 	
 	/* BCD to ASCII */
 	date[0] = (d->day >> 4)  + 0x30; // ten
@@ -296,6 +296,9 @@ void scrollDate					( rx8564_t *d, uint8_t speed)
 		
 	}// end switch
 	
+	char tmp[] = "-----";
+	strcat( date , "KW: " );
+	strcat( date , itoa( rtcGetWeek( d->day , d->month , d->year ) , tmp , 10 ) );
 	
 	/* shift the new data over the display */
 	scroll_display(date, speed);
@@ -377,10 +380,10 @@ void putChar_ud					(char c, uint8_t offset, uint8_t up)
 	}
 }
 
-void putTimeBcdToDec			(uint8_t hou, uint8_t min)
+void putTimertcBcdToDec			(uint8_t hou, uint8_t min)
 {
-	uint8_t hour	= bcdToDec( hou );
-	uint8_t minute	= bcdToDec( min );
+	uint8_t hour	= rtcBcdToDec( hou );
+	uint8_t minute	= rtcBcdToDec( min );
 	
 	putChar( ( ( hour / 10   ) + '0' ) , 1		); // show hour (ten)
 	putChar( ( ( hour % 10   ) + '0' ) , 7		); // show hour (one)
@@ -990,10 +993,10 @@ void compareTime				( void )
 	
 	/*
 	*	Uhrzeit umrechnen und zwischen speichern
-	*	Damit nicht unnötige Funktionsaufrufe von bcdToDec() entstehen beim vergleichen
+	*	Damit nicht unnötige Funktionsaufrufe von rtcBcdToDec() entstehen beim vergleichen
 	*/
-	uint8_t hour	= bcdToDec(rx8564.hour);
-	uint8_t minute	= bcdToDec(rx8564.minute);
+	uint8_t hour	= rtcBcdToDec(rx8564.hour);
+	uint8_t minute	= rtcBcdToDec(rx8564.minute);
 	
 	/*
 	*	Der aktuelle Alarm wird nach n Minuten wieder frei gegeben
@@ -1126,7 +1129,7 @@ void compareAutoDimm			( void )
 	uint16_t dimm[ DIMM_MAX - 1 ];
 	
 	
-	dimm[CURRENT_TIME]	= ( ( bcdToDec(rx8564.hour)  * 60	) + bcdToDec(rx8564.minute) );
+	dimm[CURRENT_TIME]	= ( ( rtcBcdToDec(rx8564.hour)  * 60	) + rtcBcdToDec(rx8564.minute) );
 	dimm[DIMM_OFF]		= ( ram.byte8[DIMM_HOUR_OFF] * 60	) + ram.byte8[DIMM_MINUTE_OFF];
 	dimm[DIMM_ON]		= ( ram.byte8[DIMM_HOUR_ON]	 * 60	) + ram.byte8[DIMM_MINUTE_ON];
 	
@@ -1911,7 +1914,7 @@ uint8_t menueTime			( void )
 	uint8_t ret = 0;
 	
 	rtcGetData( &rx8564 );
-	uint8_t buff[] = { 23 , 59 , bcdToDec(rx8564.hour) , bcdToDec(rx8564.minute) };
+	uint8_t buff[] = { 23 , 59 , rtcBcdToDec(rx8564.hour) , rtcBcdToDec(rx8564.minute) };
 	
 	ret = cnfgTime_( buff );
 	
@@ -2631,7 +2634,7 @@ int main( void )
 		}
 		
 		doublePointOn();
-		putTimeBcdToDec( rx8564.hour , rx8564.minute );		
+		putTimertcBcdToDec( rx8564.hour , rx8564.minute );		
 
 		sys.autoChangeNew = rx8564.second;
 		if ( sys.autoChangeNew != sys.autoChangeOld)
