@@ -297,7 +297,7 @@ void scrollDate					( rx8564_t *d, uint8_t speed)
 	}// end switch
 	
 	char tmp[] = "-----";
-	strcat( date , "KW: " );
+	strcat( date , "     KW: " );
 	strcat( date , itoa( rtcGetWeek( d->day , d->month , d->year ) , tmp , 10 ) );
 	
 	/* shift the new data over the display */
