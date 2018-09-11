@@ -152,7 +152,7 @@ rx8564_t rx8564;
  
 typedef struct
 {	
-	uint8_t		byte8[ MAX_8_BYTE_ENTRYS - 1 ];	
+	uint8_t		byte8[ MAX_8_BYTE_ENTRYS ];	
 }var_t; var_t eep EEMEM; var_t ram;
 
 typedef struct  
@@ -168,7 +168,7 @@ typedef struct
 
 typedef struct  
 {	
-	uint16_t	byte16[ MAX_BYTE16_ENTRYS - 1 ];
+	uint16_t	byte16[ MAX_BYTE16_ENTRYS ];
 }error_t; error_t err; error_t erreep EEMEM;
 
 typedef struct  
@@ -1426,7 +1426,7 @@ uint8_t dcf77StartScan			( void )
 		{
 			time.wDay = Sonntag;
 		}// end if
-					
+				
 		/* write the received dcf77 time into the rtc */
 		rtcSetTime(time.Hour, time.Min, time.Sec); // send time to RTC
 					
@@ -1436,7 +1436,7 @@ uint8_t dcf77StartScan			( void )
 		/* "eeprom_update_byte" for a long living instead of "eeprom_write_byte" */
 		eeprom_update_byte(&eep.byte8[MES_MESZ],time.stime);
 		eeprom_busy_wait();
-		eeprom_update_word( &erreep.byte16[SYNC_SUCCESS_CNT] , ++err.byte16[SYNC_SUCCESS_CNT] );
+		//eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_SUCCESS_CNT] , ++err.byte16[SYNC_SUCCESS_CNT] );
 	}
 	else
 	{	
@@ -1459,7 +1459,7 @@ uint8_t dcf77StartScan			( void )
 				strcat( errStr , decHex8( cmp[i] , buff ) );
 			}
 			scroll_display( errStr , INFO_SCROLL_SPEED);
-			eeprom_update_word( &erreep.byte16[SYNC_ERROR_CNT] , ++err.byte16[SYNC_ERROR_CNT] );			
+			eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT] , ++err.byte16[SYNC_ERROR_CNT] );			
 		}
 	}
 	
@@ -1525,7 +1525,7 @@ void defaultEEP					( void )
 	eeprom_busy_wait();
 	eeprom_write_byte(&eep.byte8[ALERT_CYCLES]			,	3	);
 	eeprom_busy_wait();
-	eeprom_update_word(&erreep.byte16[SYNC_ERROR_CNT]	,	0	);
+	eeprom_update_word(( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT]	,	0	);
 	eeprom_busy_wait();
 	eeprom_write_byte(&eep.byte8[DCF77_NUM_OF_RECORDS]	,	2	);
 	eeprom_busy_wait();
@@ -1599,10 +1599,10 @@ void loadeep					( void )
 	sys.alertCycles	= eeprom_read_byte(&eep.byte8[ALERT_CYCLES]); 
 	eeprom_busy_wait(); 	
 		
-	err.byte16[SYNC_ERROR_CNT] = eeprom_read_word( &erreep.byte16[SYNC_ERROR_CNT]  );
+	err.byte16[SYNC_ERROR_CNT] = eeprom_read_word( ( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT]  );
 	eeprom_busy_wait();
 	
-	err.byte16[SYNC_SUCCESS_CNT] = eeprom_read_word( &erreep.byte16[SYNC_SUCCESS_CNT]  );
+	err.byte16[SYNC_SUCCESS_CNT] = eeprom_read_word( ( uint16_t * )&erreep.byte16[SYNC_SUCCESS_CNT]  );
 	eeprom_busy_wait();
 	
 	ram.byte8[DCF77_NUM_OF_RECORDS] = eeprom_read_byte( &eep.byte8[DCF77_NUM_OF_RECORDS] );
@@ -1973,9 +1973,9 @@ uint8_t menueSync			( void )
 			{
 				err.byte16[SYNC_SUCCESS_CNT]	= 0;
 				err.byte16[SYNC_ERROR_CNT]	= 0; 
-				eeprom_write_word( &erreep.byte16[SYNC_ERROR_CNT], 0 );
+				eeprom_write_word( ( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT], 0 );
 				eeprom_busy_wait();
-				eeprom_write_word( &erreep.byte16[SYNC_SUCCESS_CNT] , 0);
+				eeprom_write_word( ( uint16_t * )&erreep.byte16[SYNC_SUCCESS_CNT] , 0);
 				eeprom_busy_wait();
 				scroll_display( "Geloescht.." , INFO_SCROLL_SPEED );
 			}
@@ -2233,6 +2233,7 @@ uint8_t menueBrightness		( void )
 			button.all = 0;
 			clearDisplay(false,true);
 			index = incDec( index , 15 );
+			ht1632cSendCmd ( 0xA0 + index );
 		}
 		
 		if (button.pressed.down)
@@ -2240,6 +2241,7 @@ uint8_t menueBrightness		( void )
 			button.all = 0;
 			clearDisplay(false,true);
 			index = decDec( index , 15 );
+			ht1632cSendCmd ( 0xA0 + index );
 		}
 		
 		if (button.pressed.enter)
@@ -2269,7 +2271,6 @@ uint8_t menueBrightness		( void )
 			putChar( '1' , 1 );
 			putChar( '0' + ( index - 10 ) , 7 );
 		}
-		ht1632cSendCmd(0xA0 + index);
 		
 
 		if ( index == lastSelected )
