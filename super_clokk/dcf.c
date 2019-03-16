@@ -28,6 +28,15 @@ volatile uint16_t glitchCnt;
 
 volatile tTime time = { 1,1,2014,12,05,0,Sonntag,MEZ };
 
+ #ifdef _DEBUG
+ Dcf77Debug_t DCF77Debug = 
+ {
+	 .Average[0].Minimum = 0xFFFF,
+	 .Average[1].Minimum = 0xFFFF,
+	 .Average[2].Minimum = 0xFFFF,
+ };
+ #endif
+
 /*******************************************************************************
  * 
  * Diese Funktion signalisiert den Start eines DCF77 Strangs.
@@ -272,7 +281,7 @@ bool dcf_decode (void)
  * Es wird die Länge eines Impulses und/oder einer Impulspause
  * gemessen und ausgewertet.
  */
- 
+  
 void dcf_check (void)
 {
 	/*Zur Messung der DCF77 Puls-/Pausenlänge*/
@@ -283,8 +292,20 @@ void dcf_check (void)
 	if( DCF77_DATA )
 	{
 		/* >1500 ms low? */
-		if( dcf_cntL > 1500 )
-		{
+		if( dcf_cntL >= 1490 ) // Standardwert = 1500
+		{	
+			#ifdef _DEBUG
+			if ( dcf_cntL < DCF77Debug.Average[DEBUG_DCF77_START_TIME].Minimum )
+			{
+				DCF77Debug.Average[DEBUG_DCF77_START_TIME].Minimum = dcf_cntL;
+			}
+			
+			if ( dcf_cntL > DCF77Debug.Average[DEBUG_DCF77_START_TIME].Maximum )
+			{
+				DCF77Debug.Average[DEBUG_DCF77_START_TIME].Maximum = dcf_cntL;
+			}
+			#endif
+			
 			dcf_available	= true;
 			dcf_value		= DCF_START;
 			dcf_cntL		= 0;
@@ -301,15 +322,39 @@ void dcf_check (void)
 	else
 	{
 		/* >180 ms high? */
-		if( dcf_cntH > 180 )
+		if( dcf_cntH >= 175 ) // Standardwert = 180
 		{
+			#ifdef _DEBUG
+			if ( dcf_cntH < DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].Minimum )
+			{
+				DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].Minimum = dcf_cntH;
+			}
+			
+			if ( dcf_cntH > DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].Maximum )
+			{
+				DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].Maximum = dcf_cntH;
+			}
+			#endif
+			
 			dcf_available	= true;
 			dcf_value		= DCF_HIGH;
 			dcf_cntH		= 0;
 		}
 		/* >80 ms high? */
-		else if( dcf_cntH > 80 )
+		else if( dcf_cntH >= 75 ) // Standardwert = 80
 		{
+			#ifdef _DEBUG
+			if ( dcf_cntH < DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].Minimum )
+			{
+				DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].Minimum = dcf_cntH;
+			}
+			
+		    if ( dcf_cntH > DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].Maximum )
+			{
+				DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].Maximum = dcf_cntH;
+			}
+			#endif
+			
 			dcf_available	= true;
 			dcf_value		= DCF_LOW;
 			dcf_cntH		= 0;

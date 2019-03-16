@@ -307,6 +307,39 @@ void scrollDate					( rx8564_t *d, uint8_t speed)
 
 }
 
+#ifdef _DEBUG
+void ScrollDebugMsg( Dcf77Debug_t *Object )
+{
+	char Msg[350] = "";
+	
+	strcpy(  Msg , " ++DEBUG++ " );
+	
+	char Tmp[10] = "";
+	
+	strcat( Msg , "<Start> ");
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_START_TIME].Minimum , Tmp , 10 ));
+	strcat( Msg , "-");
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_START_TIME].Maximum , Tmp , 10 ));
+	strcat( Msg , " | ");
+	
+	strcat( Msg , "<Low> ");
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_LOW_TIME].Minimum , Tmp , 10 ));
+	strcat( Msg , "-");
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_LOW_TIME].Maximum , Tmp , 10 ));
+	strcat( Msg , " | ");
+
+	strcat( Msg , "<High> ");
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Minimum , Tmp , 10 ));
+	strcat( Msg , "-");
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Maximum , Tmp , 10 ));	
+	
+	/* shift the new data over the display */
+	scroll_display( Msg , 45 );
+	
+	clearDisplay( true , false );	
+}
+#endif
+
 void putChar_ud					(char c, uint8_t offset, uint8_t up) 
 {
 	char buff[7];
@@ -1463,6 +1496,14 @@ uint8_t dcf77StartScan			( void )
 		}
 	}
 	
+	#ifdef _DEBUG
+	for ( uint8_t i = 0 ; i < DEBUG_DCF77_MAX ; i++ )
+	{
+		DCF77Debug.Average[i].Maximum = 0;
+		DCF77Debug.Average[i].Minimum = 0;
+	}
+	#endif
+	
 	/*
 	*	Sollte während der Funktion eine Taste betätigt wurden sein,
 	*	müssen wir diese vor verlassen noch bestätigen
@@ -2602,7 +2643,15 @@ int main( void )
 		alarmRoutine();
 		compareAutoDimm();
 			
-		if ( button.pressed.down )
+		if ( button.pressed.exit )
+		{
+			button.all = 0;
+			#ifdef _DEBUG
+			ScrollDebugMsg( &DCF77Debug );
+			#endif 
+			button.all = 0;
+		}			
+		else if ( button.pressed.down )
 		{		
 			button.all = 0;
 			scrollDate( &rx8564 , TEMP_PRESS_DATE_SCROLL_SPEED);
@@ -2674,6 +2723,10 @@ int main( void )
 			scrollTemperature (TEMP_PRESS_DATE_SCROLL_SPEED);
 			scrollPressure(TEMP_PRESS_DATE_SCROLL_SPEED);
 			
+			#ifdef _DEBUG
+			ScrollDebugMsg( &DCF77Debug );
+			#endif 
+		
 		}// end if
 				
 		/*	Zeitsynchronisation

@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include <avr/io.h>
 
+
+
 /*******************************************************************************
  * DCF77 Datenstruktur
  */
@@ -79,6 +81,37 @@ struct sTime
  extern volatile bool		dcf77ScanIsActive;
  extern volatile uint8_t	dcfNewData;
 
+
+#define _DEBUG
+
+#ifdef _DEBUG
+
+#warning __DEBUG_MODE_IS_ENABLED__
+
+typedef struct
+{
+	enum DCF77
+	{
+		DEBUG_DCF77_START_TIME,
+		DEBUG_DCF77_LOW_TIME,
+		DEBUG_DCF77_HIGH_TIME,
+		
+		DEBUG_DCF77_MAX
+	}DCF77_DEBUG_ENUM;
+	
+
+	
+	struct
+	{
+		uint16_t Minimum;
+		uint16_t Maximum;
+	}Average[3];
+		
+}Dcf77Debug_t;
+
+ Dcf77Debug_t DCF77Debug;
+ #endif
+ 
  /*******************************************************************************
  * Es folgt die Liste mit den Prototypen der implementierten Funktionen.
  */

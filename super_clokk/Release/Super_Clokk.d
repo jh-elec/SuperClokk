@@ -23,7 +23,7 @@ Super_Clokk.d Super_Clokk.o: .././Super_Clokk.c \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\eeprom.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\wdt.h \
- .././Super_Clokk.h .././rx8564.h .././delay.h .././i2cmaster.h \
+ .././Super_Clokk.h .././rx8564.h .././i2cmaster.h .././delay.h \
  .././dcf.h .././ht1632c.h .././5x8font.h .././RX8564.h .././BMP180.h \
  .././build_info.h .././convert.h .././bytes_inf.h
 
@@ -79,9 +79,9 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 
 .././rx8564.h:
 
-.././delay.h:
-
 .././i2cmaster.h:
+
+.././delay.h:
 
 .././dcf.h:
 
