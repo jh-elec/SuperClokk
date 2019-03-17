@@ -24,7 +24,6 @@ volatile bool checkDCF;                  // Pin Überwachung
 volatile bool syncDCF;
 volatile bool dcf77ScanIsActive;
 volatile uint8_t dcfNewData;
-volatile uint16_t glitchCnt;
 
 volatile tTime time = { 1,1,2014,12,05,0,Sonntag,MEZ };
 
@@ -292,7 +291,7 @@ void dcf_check (void)
 	if( DCF77_DATA )
 	{
 		/* >1500 ms low? */
-		if( dcf_cntL >= 1490 ) // Standardwert = 1500
+		if( dcf_cntL >= 40 ) // Standardwert = 1500
 		{	
 			#ifdef _DEBUG
 			if ( dcf_cntL < DCF77Debug.Average[DEBUG_DCF77_START_TIME].Minimum )
@@ -322,7 +321,7 @@ void dcf_check (void)
 	else
 	{
 		/* >180 ms high? */
-		if( dcf_cntH >= 175 ) // Standardwert = 180
+		if( dcf_cntH >= 18 ) // Standardwert = 180
 		{
 			#ifdef _DEBUG
 			if ( dcf_cntH < DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].Minimum )
@@ -341,7 +340,7 @@ void dcf_check (void)
 			dcf_cntH		= 0;
 		}
 		/* >80 ms high? */
-		else if( dcf_cntH >= 75 ) // Standardwert = 80
+		else if( dcf_cntH >= 8 ) // Standardwert = 80
 		{
 			#ifdef _DEBUG
 			if ( dcf_cntH < DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].Minimum )

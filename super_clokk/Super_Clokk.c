@@ -33,7 +33,7 @@
 /* speed for scroll the "temperature" & "date" & "pressure" @ display */
 #define TEMP_PRESS_DATE_SCROLL_SPEED	20
 
-#define BLINK_INTERVALL_MS				400
+#define BLINK_INTERVALL_MS				40
 
 #define ALERTS							8
 
@@ -1308,6 +1308,14 @@ uint8_t cnfgTime_				( uint8_t *buff )
 uint8_t dcf77StartScan			( void )
 {			
 	uint8_t	dcfTmeOut = 0 , dcfTmeOutOld = 0;
+
+	#ifdef _DEBUG
+	for ( uint8_t i = 0 ; i < DEBUG_DCF77_MAX ; i++ )
+	{
+		DCF77Debug.Average[i].Maximum = 0;
+		DCF77Debug.Average[i].Minimum = 0xFFFF;
+	}
+	#endif
 	
 	/*
 	*	Bit		Beschreibung
@@ -1350,10 +1358,11 @@ uint8_t dcf77StartScan			( void )
 				dcfTmeOut++;
 			}
 
-			if ( ( checkDCF && syncDCF ) )
+			if ( ( checkDCF) )
 			{
 				checkDCF = false;
 				dcf_check();
+				HEARTBEAT_LED_TOGGLE;
 			}
 		
 			if ( SWITCH_EXIT_PRESSED )
@@ -1381,6 +1390,7 @@ uint8_t dcf77StartScan			( void )
 				state				|= 1<<1;
 				break;
 			}
+			
 		}// end while
 
 		/*
@@ -1495,15 +1505,7 @@ uint8_t dcf77StartScan			( void )
 			eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT] , ++err.byte16[SYNC_ERROR_CNT] );			
 		}
 	}
-	
-	#ifdef _DEBUG
-	for ( uint8_t i = 0 ; i < DEBUG_DCF77_MAX ; i++ )
-	{
-		DCF77Debug.Average[i].Maximum = 0;
-		DCF77Debug.Average[i].Minimum = 0;
-	}
-	#endif
-	
+		
 	/*
 	*	Sollte während der Funktion eine Taste betätigt wurden sein,
 	*	müssen wir diese vor verlassen noch bestätigen
@@ -2582,8 +2584,8 @@ int main( void )
 	*	Wird auf CompareMatch eingestellt
 	*	Auslöseintervall.: 1ms
 	*/
-	TCCR2  |= ((1<<CS22) | (1<<WGM21)); // Prescaler : 64
-	OCR2   = ((F_CPU / 64 / 1000 ) - 1 ); 
+	TCCR2  |= ((1<<CS22) | (1<<CS21) | (1<<CS20) | (1<<WGM21)); // Prescaler : 1024
+	OCR2   = ((F_CPU / 1024 / 100 ) - 1 ); 
 	
     /*	Interrupts
 	*	Globale Interrupts aktivieren
@@ -2736,6 +2738,11 @@ int main( void )
 		if ( ( sys.syncHourCntDCF77 >= ram.byte8[SYNC_HOUR] ) && ( sys.syncMinuteCntDCF77 >= ( ram.byte8[SYNC_MINUTE] ) ) )
 		{			
 			dcf77StartScan();
+			
+			#ifdef _DEBUG
+			ScrollDebugMsg( &DCF77Debug );
+			#endif
+			
 			oldSyncTime	= rx8564.minute;
 		}	
 		
