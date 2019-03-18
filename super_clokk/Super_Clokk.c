@@ -33,7 +33,7 @@
 /* speed for scroll the "temperature" & "date" & "pressure" @ display */
 #define TEMP_PRESS_DATE_SCROLL_SPEED	20
 
-#define BLINK_INTERVALL_MS				40
+#define BLINK_INTERVALL_MS				400
 
 #define ALERTS							8
 
@@ -1527,13 +1527,15 @@ uint8_t dcf77StartScan			( void )
 			}
 			scroll_display( errStr , INFO_SCROLL_SPEED);
 			
+			#ifdef _DEBUG
 			for ( uint8_t y = 0 ; y < i ; y++ )
 			{
-				char Tmp[] = { '<' , y + '0' , '>' , ' ' , '\0' };
+				char Tmp[] = { '<' , (1+y) + '0' , '.' , '.' , i + '0' , '>' , ' ' , '\0' };
 				scroll_display( "Scan " , 35 );
 				scroll_display( Tmp , 35);
 				ScrollDebugMsg( &Dcf77ScanDebug[y] );
 			}
+			#endif
 			
 			eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT] , ++err.byte16[SYNC_ERROR_CNT] );			
 		}
@@ -1705,7 +1707,7 @@ typedef struct
 	uint8_t menuePos;
 }menue_t;
 
-uint8_t openMenue			( menue_t *m , size_t size );
+uint8_t openMenue			( menue_t *m , size_t size , uint8_t *sPara );
 uint8_t menueAlarm			( void );
 uint8_t menueAutoDimm		( void );
 uint8_t menueAutoChange		( void );
@@ -1774,9 +1776,19 @@ menue_t menueSync_struct		[] =
 };
 
 
-uint8_t openMenue			( menue_t *m , size_t size )
+uint8_t openMenue			( menue_t *m , size_t size , uint8_t *sPara )
 {
-	uint8_t index = menueCursor;
+	uint8_t index = 0;
+	
+	if ( sPara != NULL)
+	{
+		index = sPara[0];
+	}
+	else
+	{
+		index = menueCursor;
+	}
+	
 
 	flag.menueOpen	= 1;
 
@@ -1849,7 +1861,9 @@ uint8_t menueAlarm			( void )
 {
 	uint8_t ret	= 0;
 	
-	ret = openMenue( menueAlert_struct , sizeof(menueAlert_struct) / sizeof(menueAlert_struct[0]) );
+Anfang:
+	
+	ret = openMenue( menueAlert_struct , sizeof(menueAlert_struct) / sizeof(menueAlert_struct[0]) , &ret );
 	
 	if ( ret == _MENUE_EXIT_ || ret == 9 )
 	{
@@ -1885,7 +1899,7 @@ uint8_t menueAlarm			( void )
 	}
 		
 	uint8_t choose	= 0;
-	choose = openMenue( menueOnOff_struct , sizeof(menueOnOff_struct) / sizeof(menueOnOff_struct[0]) );
+	choose = openMenue( menueOnOff_struct , sizeof(menueOnOff_struct) / sizeof(menueOnOff_struct[0]) , NULL );
 		
 	switch( choose )
 	{
@@ -1924,6 +1938,8 @@ uint8_t menueAlarm			( void )
 	
 	scroll_display( (const __flash char *)"Gespeichert..!" , SCROLL_SAVE_SPEED );
 	
+	goto Anfang;
+	
 	return ret;
 }
 
@@ -1931,11 +1947,14 @@ uint8_t menueAutoDimm		( void )
 {
 	uint8_t ret	= 0;
 	
-	ret = openMenue( menueAutoDimm_struct , sizeof(menueAutoDimm_struct) / sizeof(menueAutoDimm_struct[0]) );
+Anfang:
+	
+	ret = openMenue( menueAutoDimm_struct , sizeof(menueAutoDimm_struct) / sizeof(menueAutoDimm_struct[0]) , &ret );
 	
 	if ( ret == _MENUE_EXIT_ )
 	{
-		return ret;
+		HEARTBEAT_LED_TOGGLE;
+		return _MENUE_EXIT_;
 	}
 
 	uint8_t buff[] = { 23 , 59 , eeprom_read_byte( &eep.byte8[ DIMM_HOUR_ON + ret ]) , eeprom_read_byte( &eep.byte8[ DIMM_MINUTE_ON + ret ]) }; // Darf nicht verändert werden..
@@ -1959,6 +1978,11 @@ uint8_t menueAutoDimm		( void )
 	clearDisplay( true , false );
 	
 	scroll_display( (const __flash char *)"Gespeichert..!" , SCROLL_SAVE_SPEED );	
+
+	if ( ret != _MENUE_EXIT_ )
+	{
+		goto Anfang;
+	}
 	
 	return 0;	
 }
@@ -2013,7 +2037,9 @@ uint8_t menueSync			( void )
 {
 	uint8_t ret = 0;
 	
-	ret = openMenue( menueSync_struct ,  sizeof(menueSync_struct) / sizeof(menueSync_struct[0]) );
+Anfang:
+
+	ret = openMenue( menueSync_struct ,  sizeof(menueSync_struct) / sizeof(menueSync_struct[0]) , &ret );
 	
 	if ( ret == _MENUE_EXIT_ )
 	{
@@ -2067,6 +2093,8 @@ uint8_t menueSync			( void )
 			return _MENUE_EXIT_;
 		}break;
 	}
+	
+	goto Anfang;
 	
 	return 0;
 }
@@ -2125,7 +2153,7 @@ uint8_t menueSound			( void )
 	
 	uint8_t ret	= 0;
 
-	ret = openMenue( menueOnOff_struct , sizeof(menueOnOff_struct) / sizeof(menueOnOff_struct[0]) );
+	ret = openMenue( menueOnOff_struct , sizeof(menueOnOff_struct) / sizeof(menueOnOff_struct[0]) , NULL );
 	
 	if ( ret == _MENUE_EXIT_ )
 	{
@@ -2173,7 +2201,7 @@ uint8_t menueMotor			( void )
 	
 	uint8_t ret	= 0;
 
-	ret = openMenue( menueOnOff_struct , sizeof(menueOnOff_struct) / sizeof(menueOnOff_struct[0]) );
+	ret = openMenue( menueOnOff_struct , sizeof(menueOnOff_struct) / sizeof(menueOnOff_struct[0]) , NULL );
 
 	
 	if ( ret == _MENUE_EXIT_ )
@@ -2717,7 +2745,7 @@ int main( void )
 			
 			while( ( index != _MENUE_EXIT_ ) && ( flag.alertEnable == 0 ) )
 			{
-				index = openMenue( menue_struct , sizeof(menue_struct) / sizeof(menue_struct[0]) );
+				index = openMenue( menue_struct , sizeof(menue_struct) / sizeof(menue_struct[0]) , NULL );
 			}
 			
 			button.all = 0;
