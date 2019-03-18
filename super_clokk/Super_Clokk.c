@@ -22,7 +22,7 @@
 #define F_CPU							16000000UL
 
 /* minutes for signal timeout */
-#define DCF77_TIMEOUT_TIME				3
+#define DCF77_TIMEOUT_TIME				5
 
 /* speed for scroll the info text @ display */
 #define INFO_SCROLL_SPEED				20
@@ -120,6 +120,7 @@
 #include <util/delay.h>
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
+#include <stdlib.h>
 
 
 #include "Super_Clokk.h"
@@ -311,37 +312,34 @@ void scrollDate					( rx8564_t *d, uint8_t speed)
 void ScrollDebugMsg( Dcf77Debug_t *Object )
 {
 	char Msg[350] = "";
-	
-	strcpy(  Msg , "++DEBUG++ - " );
-	
 	char Tmp[10] = "";
 	
-	strcat( Msg , "Start> " );
+	strcpy( Msg , "<Start " );
 	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_START_TIME].Minimum , Tmp , 10 ));
 	strcat( Msg , "-" );
 	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_START_TIME].Maximum , Tmp , 10 ));
 	strcat( Msg , "-" );
 	strcat( Msg , "n=" );
 	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_START_TIME].nBits , Tmp , 10 ) );
-	strcat( Msg , " " );
+	strcat( Msg , "<" );
 	
-	strcat( Msg , " Low> " );
+	strcat( Msg , " >Low " );
 	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_LOW_TIME].Minimum , Tmp , 10 ));
 	strcat( Msg , "-" );
 	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_LOW_TIME].Maximum , Tmp , 10 ));
 	strcat( Msg , "-" );
 	strcat( Msg , "n=" );
 	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_LOW_TIME].nBits , Tmp , 10 ) );
-	strcat( Msg , " " );
+	strcat( Msg , "<" );
 
-	strcat( Msg , " High> " );
+	strcat( Msg , " >High " );
 	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Minimum , Tmp , 10 ));
 	strcat( Msg , "-" );
 	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Maximum , Tmp , 10 ));	
 	strcat( Msg , "-" );
 	strcat( Msg , "n=" );
 	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_HIGH_TIME].nBits , Tmp , 10 ) );
-	strcat( Msg , " " );
+	strcat( Msg , "<" );
 		
 	/* shift the new data over the display */
 	scroll_display( Msg , 40 );
@@ -1340,7 +1338,7 @@ uint8_t dcf77StartScan			( void )
 	*/
 	uint8_t state = 0;
 				
-	typedef struct  
+	typedef struct
 	{
 		uint8_t day;
 		uint8_t month;
@@ -1349,8 +1347,19 @@ uint8_t dcf77StartScan			( void )
 		uint8_t meszMes;
 		uint16_t year;
 	}dcfRec_t;
-	dcfRec_t dcfRec[ram.byte8[DCF77_NUM_OF_RECORDS]];	
 		
+	dcfRec_t *dcfRec = malloc( ram.byte8[DCF77_NUM_OF_RECORDS] * sizeof(dcfRec_t) );
+	if ( dcfRec == NULL )
+	{
+		return 1;
+	}
+	
+	Dcf77Debug_t *Dcf77ScanDebug = malloc( ram.byte8[DCF77_NUM_OF_RECORDS] * sizeof(Dcf77Debug_t) );
+	if ( Dcf77ScanDebug == NULL )
+	{
+		return 2;
+	}
+				
 	syncDCF				= true;
 	dcf77ScanIsActive	= true;
 	
@@ -1361,7 +1370,9 @@ uint8_t dcf77StartScan			( void )
 	*/
 	HEARTBEAT_LED_ON;
 	
-	for ( uint8_t i = 0 ; ( i < ram.byte8[DCF77_NUM_OF_RECORDS] ) && ( ! ( state ) ) ; i++ )	
+	uint8_t i;
+	
+	for ( i = 0 ; ( i < ram.byte8[DCF77_NUM_OF_RECORDS] ) && ( ! ( state ) ) ; i++ )	
 	{
 		while ( ( dcfNewData == 0 ) && ( flag.alertEnable == 0 ) && ( state == 0 ) )
 		{	
@@ -1371,10 +1382,10 @@ uint8_t dcf77StartScan			( void )
 				dcfTmeOut++;
 			}
 
-			if ( ( checkDCF) )
+			if ( checkDCF )
 			{
-				checkDCF = false;
-				dcf_check();
+				checkDCF = false;			
+				dcf_check( &Dcf77ScanDebug[i] );
 				HEARTBEAT_LED_TOGGLE;
 			}
 		
@@ -1515,6 +1526,15 @@ uint8_t dcf77StartScan			( void )
 				strcat( errStr , decHex8( cmp[i] , buff ) );
 			}
 			scroll_display( errStr , INFO_SCROLL_SPEED);
+			
+			for ( uint8_t y = 0 ; y < i ; y++ )
+			{
+				char Tmp[] = { '<' , y + '0' , '>' , ' ' , '\0' };
+				scroll_display( "Scan " , 35 );
+				scroll_display( Tmp , 35);
+				ScrollDebugMsg( &Dcf77ScanDebug[y] );
+			}
+			
 			eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_ERROR_CNT] , ++err.byte16[SYNC_ERROR_CNT] );			
 		}
 	}
@@ -1529,6 +1549,10 @@ uint8_t dcf77StartScan			( void )
 	sys.syncMinuteCntDCF77	= 0;
 		
 	flag.isDimm = false;
+	
+	free( (dcfRec_t*) dcfRec );
+	
+	free( (Dcf77Debug_t*) Dcf77ScanDebug );
 	
 	/*	DCF77
 	*	Aufnahme ist beendet
@@ -2615,11 +2639,12 @@ int main( void )
 	rtcGetData(&rx8564);
 	sys.cmpOldHour = rx8564.hour;
 	
-	ht1632c_init	( ram.byte8[BRIGHT]		);
-	scroll_display	("Start Super Clokk", 10);
+	ht1632c_init	( ram.byte8[BRIGHT]		);	
+	scroll_display	(">>Start Super Clokk<<", 10);
 	scroll_display	( buildVer() , 20		);
 	clearDisplay	( true , false			);
 
+	
 
 	if ( !flag.isInit )
 	{

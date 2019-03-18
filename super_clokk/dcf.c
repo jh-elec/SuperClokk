@@ -280,8 +280,134 @@ bool dcf_decode (void)
  * Es wird die Länge eines Impulses und/oder einer Impulspause
  * gemessen und ausgewertet.
  */
-  
-void dcf_check (void)
+
+#ifdef _DEBUG
+bool dcf_check ( Dcf77Debug_t *DebugOut )
+{
+	/*Zur Messung der DCF77 Puls-/Pausenlänge*/
+	static uint16_t dcf_cntL = 0;
+	static uint16_t dcf_cntH = 0;
+
+	/* Überwachung des Signals */
+	if( DCF77_DATA )
+	{
+		/* >1500 ms low? */
+		if( dcf_cntL >= 1400 ) // Standardwert = 1500
+		{
+			#ifdef _DEBUG
+			if ( dcf_cntL < DebugOut->Average[DEBUG_DCF77_START_TIME].Minimum )
+			{
+				DebugOut->Average[DEBUG_DCF77_START_TIME].Minimum = dcf_cntL;
+			}
+			
+			if ( dcf_cntL > DebugOut->Average[DEBUG_DCF77_START_TIME].Maximum )
+			{
+				DebugOut->Average[DEBUG_DCF77_START_TIME].Maximum = dcf_cntL;
+			}
+			#endif
+			
+			DebugOut->Average[DEBUG_DCF77_START_TIME].nBits++;
+			dcf_available	= true;
+			dcf_value		= DCF_START;
+			dcf_cntL		= 0;
+		}
+		/* Störimpuls */
+		else
+		{
+			dcf_cntL = 0;
+		}
+
+		/*High-Counter*/
+		dcf_cntH++;
+	}
+	else
+	{
+		/* >180 ms high? */
+		if( dcf_cntH >= 180 ) // Standardwert = 180
+		{
+			#ifdef _DEBUG
+			if ( dcf_cntH < DebugOut->Average[DEBUG_DCF77_HIGH_TIME].Minimum )
+			{
+				DebugOut->Average[DEBUG_DCF77_HIGH_TIME].Minimum = dcf_cntH;
+			}
+			
+			if ( dcf_cntH > DebugOut->Average[DEBUG_DCF77_HIGH_TIME].Maximum )
+			{
+				DebugOut->Average[DEBUG_DCF77_HIGH_TIME].Maximum = dcf_cntH;
+			}
+			#endif
+			
+			DebugOut->Average[DEBUG_DCF77_HIGH_TIME].nBits++;
+			dcf_available	= true;
+			dcf_value		= DCF_HIGH;
+			dcf_cntH		= 0;
+		}
+		/* >80 ms high? */
+		else if( dcf_cntH >= 80 ) // Standardwert = 80
+		{
+			#ifdef _DEBUG
+			if ( dcf_cntH < DebugOut->Average[DEBUG_DCF77_LOW_TIME].Minimum )
+			{
+				DebugOut->Average[DEBUG_DCF77_LOW_TIME].Minimum = dcf_cntH;
+			}
+			
+			if ( dcf_cntH > DebugOut->Average[DEBUG_DCF77_LOW_TIME].Maximum )
+			{
+				DebugOut->Average[DEBUG_DCF77_LOW_TIME].Maximum = dcf_cntH;
+			}
+			#endif
+			
+			DebugOut->Average[DEBUG_DCF77_LOW_TIME].nBits++;
+			dcf_available	= true;
+			dcf_value		= DCF_LOW;
+			dcf_cntH		= 0;
+		}
+		/* Störimpuls */
+		else
+		{
+			dcf_cntH = 0;
+		}
+
+		/*Low-Counter*/
+		dcf_cntL++;
+	}
+	
+
+	/*Läuft eine Aufnahme?*/
+	if( dcf_running() )
+	{
+		/*Wurden alle Bits empfangen?*/
+		if( dcf_collect() )
+		{
+			/*Erfolgreich dekodiert?*/
+			if( dcf_decode() )
+			{
+				dcfNewData			= true;
+				dcf77ScanIsActive	= false;
+				
+				
+				// Abgleich fertig!
+				syncDCF = false;
+				
+				return true;
+			}
+			
+			/*Abgleich fehlgeschlagen*/
+			else
+			{
+				dcfNewData = false;
+				// Abgleich fertig!
+				syncDCF = false;
+				
+				return false;
+			}
+		}
+	}
+	
+	return true;
+}
+#else
+bool dcf_check (void)
 {
 	/*Zur Messung der DCF77 Puls-/Pausenlänge*/
 	static uint16_t dcf_cntL = 0;
@@ -387,6 +513,8 @@ void dcf_check (void)
                
 			    // Abgleich fertig!
                 syncDCF = false;
+				
+				return true;
             }
 			
             /*Abgleich fehlgeschlagen*/
@@ -395,7 +523,13 @@ void dcf_check (void)
 				dcfNewData = false;				
                 // Abgleich fertig!
                 syncDCF = false;
+				
+				return false;
             }
         }
     }
+	
+	return true;
 }
+#endif
+  

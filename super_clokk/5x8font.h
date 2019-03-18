@@ -71,8 +71,32 @@ const char font_69[] PROGMEM = { ')', 4, 0x00, 0x81, 0x42, 0x3C, 0x00}; //  )
 const char font_70[] PROGMEM = { '+', 5, 0x08, 0x08, 0x3E, 0x08, 0x08}; //  "+"
 const char font_71[] PROGMEM = { '-', 5, 0x08, 0x08, 0x08, 0x08, 0x08}; //  -
 const char font_72[] PROGMEM = { '=', 5, 0x14, 0x14, 0x14, 0x14, 0x14}; //  =
-const char font_73[] PROGMEM = { '>', 5, 0x08, 0x08, 0x2A, 0x1C, 0x08}; //  R arrow
-const char font_74[] PROGMEM = { '<', 5, 0x08, 0x1C, 0x2A, 0x08, 0x08}; //  L arrow
+
+const char font_73[] PROGMEM = 
+{ '<', 5, 
+  0B00011000,
+  0B00111100,
+  0B01100110,
+  0B11000011,
+  0B10000001,
+  0B00000000,
+  0B00000000,
+  0B00000000
+}; //  R arrow
+
+const char font_74[] PROGMEM = 
+{ '>', 5, 
+  0B10000001,
+  0B11000011,
+  0B01100110,
+  0B00111100,
+  0B00011000,
+  0B00000000,
+  0B00000000,
+  0B00000000
+}; //  L arrow
+
+
 const char font_75[] PROGMEM = { '$', 5, 0x12, 0x2A, 0x7F, 0x2A, 0x24}; //  $
 const char font_76[] PROGMEM = { '*', 5, 0x44, 0x02, 0x12, 0x02, 0x44}; //  smile
 const char font_77[] PROGMEM = { '`', 5, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; //  5x8 block

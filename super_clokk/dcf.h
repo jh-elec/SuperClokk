@@ -120,6 +120,11 @@ typedef struct
 bool dcf_running (void);
 bool dcf_collect (void);
 bool dcf_decode (void);
-void dcf_check (void);
+
+#ifdef _DEBUG
+bool dcf_check ( Dcf77Debug_t *DebugOut );
+#else
+bool dcf_check (void);
+#endif
 
 #endif	/* DCF_H */
