@@ -105,6 +105,7 @@ typedef struct
 	{
 		uint16_t Minimum;
 		uint16_t Maximum;
+		uint8_t	 nBits;
 	}Average[3];
 		
 }Dcf77Debug_t;

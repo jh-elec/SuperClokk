@@ -291,7 +291,7 @@ void dcf_check (void)
 	if( DCF77_DATA )
 	{
 		/* >1500 ms low? */
-		if( dcf_cntL >= 40 ) // Standardwert = 1500
+		if( dcf_cntL >= 1400 ) // Standardwert = 1500
 		{	
 			#ifdef _DEBUG
 			if ( dcf_cntL < DCF77Debug.Average[DEBUG_DCF77_START_TIME].Minimum )
@@ -305,6 +305,7 @@ void dcf_check (void)
 			}
 			#endif
 			
+			DCF77Debug.Average[DEBUG_DCF77_START_TIME].nBits++;
 			dcf_available	= true;
 			dcf_value		= DCF_START;
 			dcf_cntL		= 0;
@@ -321,7 +322,7 @@ void dcf_check (void)
 	else
 	{
 		/* >180 ms high? */
-		if( dcf_cntH >= 18 ) // Standardwert = 180
+		if( dcf_cntH >= 180 ) // Standardwert = 180
 		{
 			#ifdef _DEBUG
 			if ( dcf_cntH < DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].Minimum )
@@ -335,12 +336,13 @@ void dcf_check (void)
 			}
 			#endif
 			
+			DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].nBits++;
 			dcf_available	= true;
 			dcf_value		= DCF_HIGH;
 			dcf_cntH		= 0;
 		}
 		/* >80 ms high? */
-		else if( dcf_cntH >= 8 ) // Standardwert = 80
+		else if( dcf_cntH >= 80 ) // Standardwert = 80
 		{
 			#ifdef _DEBUG
 			if ( dcf_cntH < DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].Minimum )
@@ -354,6 +356,7 @@ void dcf_check (void)
 			}
 			#endif
 			
+			DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].nBits++;
 			dcf_available	= true;
 			dcf_value		= DCF_LOW;
 			dcf_cntH		= 0;

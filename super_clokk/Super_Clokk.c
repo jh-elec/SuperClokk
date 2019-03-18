@@ -312,29 +312,39 @@ void ScrollDebugMsg( Dcf77Debug_t *Object )
 {
 	char Msg[350] = "";
 	
-	strcpy(  Msg , " ++DEBUG++ " );
+	strcpy(  Msg , "++DEBUG++ - " );
 	
 	char Tmp[10] = "";
 	
-	strcat( Msg , "<Start> ");
-	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_START_TIME].Minimum , Tmp , 10 ));
-	strcat( Msg , "-");
-	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_START_TIME].Maximum , Tmp , 10 ));
-	strcat( Msg , " | ");
+	strcat( Msg , "Start> " );
+	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_START_TIME].Minimum , Tmp , 10 ));
+	strcat( Msg , "-" );
+	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_START_TIME].Maximum , Tmp , 10 ));
+	strcat( Msg , "-" );
+	strcat( Msg , "n=" );
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_START_TIME].nBits , Tmp , 10 ) );
+	strcat( Msg , " " );
 	
-	strcat( Msg , "<Low> ");
-	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_LOW_TIME].Minimum , Tmp , 10 ));
-	strcat( Msg , "-");
-	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_LOW_TIME].Maximum , Tmp , 10 ));
-	strcat( Msg , " | ");
+	strcat( Msg , " Low> " );
+	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_LOW_TIME].Minimum , Tmp , 10 ));
+	strcat( Msg , "-" );
+	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_LOW_TIME].Maximum , Tmp , 10 ));
+	strcat( Msg , "-" );
+	strcat( Msg , "n=" );
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_LOW_TIME].nBits , Tmp , 10 ) );
+	strcat( Msg , " " );
 
-	strcat( Msg , "<High> ");
-	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Minimum , Tmp , 10 ));
-	strcat( Msg , "-");
-	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Maximum , Tmp , 10 ));	
-	
+	strcat( Msg , " High> " );
+	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Minimum , Tmp , 10 ));
+	strcat( Msg , "-" );
+	strcat( Msg , ultoa( Object->Average[DEBUG_DCF77_HIGH_TIME].Maximum , Tmp , 10 ));	
+	strcat( Msg , "-" );
+	strcat( Msg , "n=" );
+	strcat( Msg , itoa( Object->Average[DEBUG_DCF77_HIGH_TIME].nBits , Tmp , 10 ) );
+	strcat( Msg , " " );
+		
 	/* shift the new data over the display */
-	scroll_display( Msg , 45 );
+	scroll_display( Msg , 40 );
 	
 	clearDisplay( true , false );	
 }
@@ -1315,6 +1325,9 @@ uint8_t dcf77StartScan			( void )
 		DCF77Debug.Average[i].Maximum = 0;
 		DCF77Debug.Average[i].Minimum = 0xFFFF;
 	}
+	DCF77Debug.Average[DEBUG_DCF77_START_TIME].nBits = 0;
+	DCF77Debug.Average[DEBUG_DCF77_LOW_TIME].nBits = 0;
+	DCF77Debug.Average[DEBUG_DCF77_HIGH_TIME].nBits = 0;
 	#endif
 	
 	/*
@@ -1514,7 +1527,7 @@ uint8_t dcf77StartScan			( void )
 	
 	sys.syncHourCntDCF77	= 0;
 	sys.syncMinuteCntDCF77	= 0;
-	
+		
 	flag.isDimm = false;
 	
 	/*	DCF77
@@ -2584,8 +2597,8 @@ int main( void )
 	*	Wird auf CompareMatch eingestellt
 	*	Auslöseintervall.: 1ms
 	*/
-	TCCR2  |= ((1<<CS22) | (1<<CS21) | (1<<CS20) | (1<<WGM21)); // Prescaler : 1024
-	OCR2   = ((F_CPU / 1024 / 100 ) - 1 ); 
+	TCCR2  |= ((1<<CS22) | (1<<WGM21)); // Prescaler : 64
+	OCR2   = ((F_CPU / 64 / 1000 ) - 1 ); 
 	
     /*	Interrupts
 	*	Globale Interrupts aktivieren
@@ -2726,7 +2739,7 @@ int main( void )
 			scrollPressure(TEMP_PRESS_DATE_SCROLL_SPEED);
 			
 			#ifdef _DEBUG
-			ScrollDebugMsg( &DCF77Debug );
+			//ScrollDebugMsg( &DCF77Debug );
 			#endif 
 		
 		}// end if
