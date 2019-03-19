@@ -22,7 +22,7 @@
 #define F_CPU							16000000UL
 
 /* minutes for signal timeout */
-#define DCF77_TIMEOUT_TIME				5
+#define DCF77_TIMEOUT_TIME				2
 
 /* speed for scroll the info text @ display */
 #define INFO_SCROLL_SPEED				20
@@ -1371,6 +1371,7 @@ uint8_t dcf77StartScan			( void )
 	HEARTBEAT_LED_ON;
 	
 	uint8_t i;
+
 	
 	for ( i = 0 ; ( i < ram.byte8[DCF77_NUM_OF_RECORDS] ) && ( ! ( state ) ) ; i++ )	
 	{
@@ -1846,7 +1847,8 @@ uint8_t openMenue			( menue_t *m , size_t size , uint8_t *sPara )
 			
 			sys.menueTimeout = 0;
 			
-			return index;
+			return m[index].menuePos;
+			//return index;
 		}
 	}
 	
@@ -1953,7 +1955,6 @@ Anfang:
 	
 	if ( ret == _MENUE_EXIT_ )
 	{
-		HEARTBEAT_LED_TOGGLE;
 		return _MENUE_EXIT_;
 	}
 
