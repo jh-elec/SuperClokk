@@ -35,8 +35,6 @@
 
 #define BLINK_INTERVALL_MS				400
 
-#define ALERTS							8
-
 /* switches */
 #define SWITCH_MENUE_PRESSED		(!(PINC & (1<<PC2))) 
 #define SWITCH_MENUE_RELEASED		(PINC & (1<<PC2))
@@ -145,8 +143,10 @@
 	 ALERT_SIX,
 	 ALERT_SEVEN,
 	 ALERT_EIGHT,
+	 ALERT_END_OF_DAY,
 	 
-	 ALERT_MAX
+	 
+	 __ALERT_MAX__
  }alert_e;
  
 rx8564_t rx8564; 
@@ -175,8 +175,8 @@ typedef struct
 typedef struct  
 {
 	alert_e name;	
-	uint8_t enable;
-	uint8_t ring;
+	uint16_t enable;
+	uint16_t ring;
 }alert_t; alert_t alert;
 
 typedef struct  
@@ -1065,7 +1065,7 @@ void compareTime				( void )
 	/*
 	*	Aktuelle Uhrzeit mit den eingetellten Alarmzeiten überprüfen
 	*/
-	for ( uint8_t i = 0 ; i < ALERTS ; i++ )
+	for ( uint8_t i = 0 ; i < __ALERT_MAX__ ; i++ )
 	{
 		if ( ( hour == ram.byte8[ ALERT_HOUR_1 + i ] ) &&  ( minute == ram.byte8[ ALERT_MINUTE_1 + i ] ) && ( alert.enable & 1<<i ) )
 		{	
@@ -1099,6 +1099,7 @@ void alarmRoutine				( void )
 			case 1<<5: alertNum = 6; break;
 			case 1<<6: alertNum = 7; break;
 			case 1<<7: alertNum = 8; break;
+			case 1<<8: alertNum = 9; break;
 		}
 		
 		sprintf( buff, "A.: %d!" , alertNum );
@@ -1107,46 +1108,69 @@ void alarmRoutine				( void )
 		
 		ht1632cSendCmd(0x09); // "blinken" Kommando senden
 		
-		for ( uint8_t i = 0 ; i < sys.alertCycles ; i++ )
+		if ( ( alert.ring & 1<<8 ) )
 		{
 			if ( flag.motorEnable )
 			{
 				VIBRATION_MOTOR_ON;
 			}
-			_delay_ms(1000);
-			VIBRATION_MOTOR_OFF;
 			
-			for (uint8_t x = 0 ; x < 10 ; x++)
+			if ( flag.soundEnable )
 			{
-				HEARTBEAT_LED_ON;
-				
+				ALARM_SOUND_ON;
+			}
+			HEARTBEAT_LED_ON;
+			
+			_delay_ms(2000);
+			
+			VIBRATION_MOTOR_OFF;
+			HEARTBEAT_LED_OFF;
+			ALARM_SOUND_OFF;			
+		}
+		else
+		{
+			for ( uint8_t i = 0 ; i < sys.alertCycles ; i++ )
+			{
 				if ( flag.motorEnable )
 				{
 					VIBRATION_MOTOR_ON;
 				}
-
-				if ( flag.soundEnable )
-				{
-					ALARM_SOUND_ON;
-				}
-
-				_delay_ms(50);
-				HEARTBEAT_LED_OFF;
+				_delay_ms(1000);
 				VIBRATION_MOTOR_OFF;
-				ALARM_SOUND_OFF;
-				_delay_ms(250);
-				
-				if (SWITCH_MENUE_PRESSED || SWITCH_EXIT_PRESSED || SWITCH_SET_DOWN_PRESSED || SWITCH_SET_UP_PRESSED || SWITCH_ENTER_PRESSED)
-				{					
-					break;
-				}
-			}// end for
 			
-			if (SWITCH_MENUE_PRESSED || SWITCH_EXIT_PRESSED || SWITCH_SET_DOWN_PRESSED || SWITCH_SET_UP_PRESSED || SWITCH_ENTER_PRESSED)
-			{
-				break;	
-			}		
-		}// end for
+				for (uint8_t x = 0 ; x < 10 ; x++)
+				{
+					HEARTBEAT_LED_ON;
+				
+					if ( flag.motorEnable )
+					{
+						VIBRATION_MOTOR_ON;
+					}
+
+					if ( flag.soundEnable )
+					{
+						ALARM_SOUND_ON;
+					}
+
+					_delay_ms(50);
+					HEARTBEAT_LED_OFF;
+					VIBRATION_MOTOR_OFF;
+					ALARM_SOUND_OFF;
+					_delay_ms(250);
+				
+					if (SWITCH_MENUE_PRESSED || SWITCH_EXIT_PRESSED || SWITCH_SET_DOWN_PRESSED || SWITCH_SET_UP_PRESSED || SWITCH_ENTER_PRESSED)
+					{					
+						break;
+					}
+				}// end for
+			
+				if (SWITCH_MENUE_PRESSED || SWITCH_EXIT_PRESSED || SWITCH_SET_DOWN_PRESSED || SWITCH_SET_UP_PRESSED || SWITCH_ENTER_PRESSED)
+				{
+					break;	
+				}		
+			}// end for			
+		}
+
 	
 	clearDisplay( true , false );				
 	flag.alertEnable	= 0;
@@ -1572,7 +1596,7 @@ void defaultEEP					( void )
 	*/
 	eeprom_busy_wait();
 	
-	if ( eeprom_read_byte( &eep.byte8[IS_INIT_BYTE_HIGH] ) == 0x21 && eeprom_read_byte( &eep.byte8[IS_INIT_BYTE_LOW] ) == 0x08 )
+	if ( eeprom_read_byte( &eep.byte8[IS_INIT_BYTE_HIGH] ) == 0x45 && eeprom_read_byte( &eep.byte8[IS_INIT_BYTE_LOW] ) == 0x77 )
 	{
 		flag.isInit = 1;
 		return;
@@ -1586,7 +1610,7 @@ void defaultEEP					( void )
 	eeprom_busy_wait();
 	eeprom_write_byte(&eep.byte8[MOTOR_ENABLE]			,	0x01	);
 	eeprom_busy_wait();
-	eeprom_write_byte(&eep.byte8[ALERT]					,	0x00	);
+	eeprom_write_word(&erreep.byte16[ALERT_ENABLE]		   ,	0x0000	);
 	eeprom_busy_wait();	
 	eeprom_write_byte(&eep.byte8[DIMM_HOUR_ON]			,	20	);
 	eeprom_busy_wait();	
@@ -1628,9 +1652,33 @@ void defaultEEP					( void )
 	eeprom_busy_wait();
 	eeprom_write_byte( &eep.byte8[ ALERT_MINUTE_4 ]		, 0 );
 	eeprom_busy_wait();	
-	eeprom_write_byte(&eep.byte8[IS_INIT_BYTE_HIGH]		, 0x21 );
+	
+	eeprom_write_byte( &eep.byte8[ ALERT_HOUR_5 ]		, 0 );
 	eeprom_busy_wait();
-	eeprom_write_byte(&eep.byte8[IS_INIT_BYTE_LOW]		, 0x08 );
+	eeprom_write_byte( &eep.byte8[ ALERT_MINUTE_5 ]		, 0 );
+	eeprom_busy_wait();	
+	eeprom_write_byte( &eep.byte8[ ALERT_HOUR_6 ]		, 0 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_MINUTE_6 ]		, 0 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_HOUR_7 ]		, 0 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_MINUTE_7 ]		, 0 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_HOUR_8 ]		, 0 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_MINUTE_8 ]		, 0 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_END_OF_DAY_HOUR ]		, 15 );
+	eeprom_busy_wait();
+	eeprom_write_byte( &eep.byte8[ ALERT_END_OF_DAY_MINUTE ]	, 0 );
+	eeprom_busy_wait();
+
+	
+	
+	eeprom_write_byte(&eep.byte8[IS_INIT_BYTE_HIGH]		, 0x45 );
+	eeprom_busy_wait();
+	eeprom_write_byte(&eep.byte8[IS_INIT_BYTE_LOW]		, 0x77 );
 	eeprom_busy_wait();
 }
 
@@ -1649,7 +1697,7 @@ void loadeep					( void )
 	flag.motorEnable = eeprom_read_byte( &eep.byte8[MOTOR_ENABLE] );
 	eeprom_busy_wait();
 	
-	alert.enable = eeprom_read_byte( &eep.byte8[ALERT] );
+	alert.enable = eeprom_read_word( &erreep.byte16[ALERT_ENABLE] );
 	eeprom_busy_wait();
 	
 	ram.byte8[DIMM_HOUR_ON] = eeprom_read_byte(&eep.byte8[DIMM_HOUR_ON]); 
@@ -1691,7 +1739,7 @@ void loadeep					( void )
 	ram.byte8[DCF77_NUM_OF_RECORDS] = eeprom_read_byte( &eep.byte8[DCF77_NUM_OF_RECORDS] );
 	eeprom_busy_wait();
 	
-	for ( uint8_t i = 0 ; i < ALERTS ; i++ )
+	for ( uint8_t i = 0 ; i < __ALERT_MAX__ ; i++ )
 	{
 		ram.byte8[ ALERT_HOUR_1 + i ] = eeprom_read_byte( &eep.byte8[ALERT_HOUR_1 + i ] );
 		eeprom_busy_wait();
@@ -1750,7 +1798,8 @@ menue_t menueAlert_struct		[] =
 	{"-A6"		, NULL			,	5		},
 	{"-A7"		, NULL			,	6		},
 	{"-A8"		, NULL			,	7		},
-	{"Cycl."	, NULL			,	8		},
+	{"-E.O.D"	, NULL			,	8		},
+	{"Cycl."	, NULL			,	9		},
 	{"Exit"		, NULL			,	_MENUE_EXIT_		},
 };
 
@@ -1867,7 +1916,7 @@ Anfang:
 	
 	ret = openMenue( menueAlert_struct , sizeof(menueAlert_struct) / sizeof(menueAlert_struct[0]) , &ret );
 	
-	if ( ret == _MENUE_EXIT_ || ret == 9 )
+	if ( ret == _MENUE_EXIT_ )
 	{
 		return ret;
 	}
@@ -1876,7 +1925,7 @@ Anfang:
 		
 	uint8_t buff[] = { 23 , 59 , eeprom_read_byte( &eep.byte8[ALERT_HOUR_1 + ret] ) , eeprom_read_byte( &eep.byte8[ALERT_MINUTE_1 + ret] ) }; // Darf nicht verändert werden..
 
-	if ( ret == 8 )
+	if ( ret == 9 )
 	{
 		menueAlarmCycle();
 		return 0;
@@ -1928,7 +1977,7 @@ Anfang:
 	eeprom_busy_wait();
 	eeprom_update_byte( &eep.byte8[ ALERT_MINUTE_1 + ret ]  , buff[1] );
 	eeprom_busy_wait();
-	eeprom_update_byte( &eep.byte8[ ALERT ] , alert.enable);
+	eeprom_update_word( &erreep.byte16[ ALERT_ENABLE ] , alert.enable);
 	eeprom_busy_wait();
 	
 	/*	Alarmzeiten
