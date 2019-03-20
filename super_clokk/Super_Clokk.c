@@ -1395,8 +1395,8 @@ uint8_t dcf77StartScan			( void )
 	HEARTBEAT_LED_ON;
 	
 	uint8_t i;
+	uint32_t lBlink = 0;
 
-	
 	for ( i = 0 ; ( i < ram.byte8[DCF77_NUM_OF_RECORDS] ) && ( ! ( state ) ) ; i++ )	
 	{
 		while ( ( dcfNewData == 0 ) && ( flag.alertEnable == 0 ) && ( state == 0 ) )
@@ -1411,7 +1411,7 @@ uint8_t dcf77StartScan			( void )
 			{
 				checkDCF = false;			
 				dcf_check( &Dcf77ScanDebug[i] );
-				HEARTBEAT_LED_TOGGLE;
+				//HEARTBEAT_LED_TOGGLE;
 			}
 		
 			if ( SWITCH_EXIT_PRESSED )
@@ -1440,6 +1440,21 @@ uint8_t dcf77StartScan			( void )
 				break;
 			}
 			
+			/* Erfassen der Zeit signalisieren */
+			if ( lBlink++ < 1e3)
+			{
+				HEARTBEAT_LED_ON;
+			}
+			if ( lBlink > 2e3 )
+			{
+				HEARTBEAT_LED_OFF;
+			}
+			if ( lBlink > 40e3 )
+			{
+				lBlink = 0;
+			}
+					
+
 		}// end while
 
 		/*
@@ -1470,36 +1485,36 @@ uint8_t dcf77StartScan			( void )
 		setPwm( ram.byte8[BRIGHT] );
 	}
 
-	uint8_t cmp[ ram.byte8[DCF77_NUM_OF_RECORDS] ], cmpCnt = 0;
-	for ( uint8_t i = 0 ; i < ram.byte8[DCF77_NUM_OF_RECORDS] ; i++ )
+	uint8_t cmp[i], cmpCnt = 0;
+	for ( uint8_t y = 0 ; y < i && i > 1 ; y++ )
 	{
-		cmp[i] = 0b00111111;
-		if ( time.Day == dcfRec[i].day )
+		cmp[y] = 0b00111111;
+		if ( time.Day == dcfRec[y].day )
 		{
-			cmp[i] &= ~(1<<0);	
+			cmp[y] &= ~(1<<0);	
 		}
-		if ( time.Month == dcfRec[i].month )
+		if ( time.Month == dcfRec[y].month )
 		{
-			cmp[i] &= ~(1<<1);
+			cmp[y] &= ~(1<<1);
 		}		
-		if ( time.Hour == dcfRec[i].hour )
+		if ( time.Hour == dcfRec[y].hour )
 		{
-			cmp[i] &= ~(1<<2);
+			cmp[y] &= ~(1<<2);
 		}		
-		if ( time.wDay == dcfRec[i].wDay )
+		if ( time.wDay == dcfRec[y].wDay )
 		{
-			cmp[i] &= ~(1<<3);
+			cmp[y] &= ~(1<<3);
 		}	
-		if ( time.stime == dcfRec[i].meszMes )
+		if ( time.stime == dcfRec[y].meszMes )
 		{
-			cmp[i] &= ~(1<<4);
+			cmp[y] &= ~(1<<4);
 		}	
-		if ( time.Year == dcfRec[i].year )
+		if ( time.Year == dcfRec[y].year )
 		{
-			cmp[i] &= ~(1<<5);
+			cmp[y] &= ~(1<<5);
 		}
 		
-		if ( ! ( cmp[i] ) )
+		if ( ! ( cmp[y] ) )
 		{
 			/*
 			*	DCF77_RECORD bestimmt den späteren Wert von
@@ -1511,7 +1526,7 @@ uint8_t dcf77StartScan			( void )
 	
 	dcf77ScanIsActive = false;
 	
-	if ( cmpCnt == ram.byte8[DCF77_NUM_OF_RECORDS] )
+	if ( cmpCnt == i )
 	{			
 		/* @ rtc Sunday is = 0. @ dcf77 is sunday = 7 */
 		if (time.wDay == 7)
@@ -1528,13 +1543,13 @@ uint8_t dcf77StartScan			( void )
 		/* "eeprom_update_byte" for a long living instead of "eeprom_write_byte" */
 		eeprom_update_byte(&eep.byte8[MES_MESZ],time.stime);
 		eeprom_busy_wait();
-		//eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_SUCCESS_CNT] , ++err.byte16[SYNC_SUCCESS_CNT] );
+		eeprom_update_word( ( uint16_t * )&erreep.byte16[SYNC_SUCCESS_CNT] , ++err.byte16[SYNC_SUCCESS_CNT] );
 	}
 	else
 	{	
 		if ( ! ( flag.alertEnable ) )
 		{
-			char errStr[ 33 + ( 5 * ram.byte8[DCF77_NUM_OF_RECORDS] ) ];
+			char errStr[ 33 + ( 5 * i ) ];
 			char buff[5]	= "";
 		
 			/*	Error String Format
@@ -1542,15 +1557,18 @@ uint8_t dcf77StartScan			( void )
 			*	Der Fehlerkode besteht aus den vergleichen empfangener
 			*	Streams
 			*/
-			strcpy( errStr , "Sync. Error - State.: " );
-			strcat( errStr , decHex8( state , buff ) );
-			strcat( errStr , " Cmp.: ");
-			for ( uint8_t i = 0 ; i < ram.byte8[DCF77_NUM_OF_RECORDS] ; i++ )
+			if ( i > 1 )
 			{
-				strcat( errStr , " " );
-				strcat( errStr , decHex8( cmp[i] , buff ) );
+				strcpy( errStr , "Sync. Error - State.: " );
+				strcat( errStr , decHex8( state , buff ) );
+				strcat( errStr , " Cmp.: ");
+				for ( uint8_t y = 0 ; y < i ; y++ )
+				{
+					strcat( errStr , " " );
+					strcat( errStr , decHex8( cmp[y] , buff ) );
+				}
+				scroll_display( errStr , INFO_SCROLL_SPEED);				
 			}
-			scroll_display( errStr , INFO_SCROLL_SPEED);
 			
 			#ifdef _DEBUG
 			for ( uint8_t y = 0 ; y < i ; y++ )
