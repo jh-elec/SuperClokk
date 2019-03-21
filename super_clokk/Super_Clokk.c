@@ -1176,6 +1176,12 @@ void alarmRoutine				( void )
 	flag.alertEnable	= 0;
 	flag.menueExit		= 0;	
 	flag.isDimm			= false;			
+
+	//////////////////////////////////////////////////
+	#warning Testphase ( 21.03.19 )
+	alert.ring			&= ~( 1<< ( alertNum - 1 ) );
+	//////////////////////////////////////////////////
+
 	setPwm( ram.byte8[BRIGHT] );
 		
 	}// end if
