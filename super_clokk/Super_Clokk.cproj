@@ -43,18 +43,18 @@
     <com_atmel_avrdbg_tool_ispmk2>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>125000</IspClock>
+          <IspClock>1000000</IspClock>
         </InterfaceProperties>
         <InterfaceName>ISP</InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
-      <ToolNumber>000200063541</ToolNumber>
+      <ToolNumber>0000A0004174</ToolNumber>
       <ToolName>AVRISP mkII</ToolName>
     </com_atmel_avrdbg_tool_ispmk2>
     <com_atmel_avrdbg_tool_avrdragon>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>0</IspClock>
+          <IspClock>125000</IspClock>
         </InterfaceProperties>
         <InterfaceName>ISP</InterfaceName>
       </ToolOptions>
@@ -63,7 +63,7 @@
       <ToolName>AVR Dragon</ToolName>
     </com_atmel_avrdbg_tool_avrdragon>
     <ExternalProgrammingToolCommand />
-    <avrtoolserialnumber>000200063541</avrtoolserialnumber>
+    <avrtoolserialnumber>0000A0004174</avrtoolserialnumber>
     <avrdeviceexpectedsignature>0x1E9502</avrdeviceexpectedsignature>
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions>
@@ -77,7 +77,7 @@
       </ToolNumber>
       <ToolName>Simulator</ToolName>
     </com_atmel_avrdbg_tool_simulator>
-    <avrtoolinterfaceclock>125000</avrtoolinterfaceclock>
+    <avrtoolinterfaceclock>1000000</avrtoolinterfaceclock>
     <ResetRule>0</ResetRule>
     <EraseKey />
   </PropertyGroup>
@@ -227,33 +227,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Datenblätter\BST-BMP180-DS000-09.pdf">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Datenblätter\dcf77.pdf">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Datenblätter\ht1632cv120.pdf">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Datenblätter\jy-mcu_3208_schematic.pdf">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Datenblätter\mega32.pdf">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Datenblätter\RTC8564.pdf">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Super_Clokk_199774_2015_03_30.brd">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="Super_Clokk_199774_2015_03_30.sch">
+    <None Include="Datasheets\045491 HOLTEK.pdf">
       <SubType>compile</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Datenblätter" />
+    <Folder Include="Datasheets" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

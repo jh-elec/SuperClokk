@@ -22,7 +22,7 @@
 #define F_CPU							16000000UL
 
 /* minutes for signal timeout */
-#define DCF77_TIMEOUT_TIME				2
+#define DCF77_TIMEOUT_TIME				3
 
 /* speed for scroll the info text @ display */
 #define INFO_SCROLL_SPEED				20
@@ -1388,14 +1388,8 @@ uint8_t dcf77StartScan			( void )
 	dcf77ScanIsActive	= true;
 	
 	MATRIX_LEDS_OFF;
-	
-	/*	DCF77
-	*	Aufnahme beginnt
-	*/
-	HEARTBEAT_LED_ON;
-	
+		
 	uint8_t i;
-	uint32_t lBlink = 0;
 
 	for ( i = 0 ; ( i < ram.byte8[DCF77_NUM_OF_RECORDS] ) && ( ! ( state ) ) ; i++ )	
 	{
@@ -1411,7 +1405,6 @@ uint8_t dcf77StartScan			( void )
 			{
 				checkDCF = false;			
 				dcf_check( &Dcf77ScanDebug[i] );
-				//HEARTBEAT_LED_TOGGLE;
 			}
 		
 			if ( SWITCH_EXIT_PRESSED )
@@ -1440,21 +1433,6 @@ uint8_t dcf77StartScan			( void )
 				break;
 			}
 			
-			/* Erfassen der Zeit signalisieren */
-			if ( lBlink++ < 1e3)
-			{
-				HEARTBEAT_LED_ON;
-			}
-			if ( lBlink > 2e3 )
-			{
-				HEARTBEAT_LED_OFF;
-			}
-			if ( lBlink > 40e3 )
-			{
-				lBlink = 0;
-			}
-					
-
 		}// end while
 
 		/*
@@ -2704,6 +2682,15 @@ int main( void )
 	PORTC |= ((1<<PC2) | (1<<PC3) | (1<<PC4) | (1<<PC5) | (1<<PC6));
 	PORTB |= (1<<PB2);
 	PORTD |= ((1<<PD5));
+	
+	/*	Eingänge des Matrix-Treibers festlegen
+	*/
+	HT1632_CS_DDR	|= (1 << HT1632_CS_BP);
+	HT1632_CS_PORT	|= (1 << HT1632_CS_BP);
+	
+	HT1632_WR_DDR	|= (1 << HT1632_WR_BP);
+	HT1632_DT_DDR	|= (1 << HT1632_DT_BP);
+	
 		
 	/*	Timer 0 
 	*	Wird auf CompareMatch eingestellt
@@ -2988,7 +2975,19 @@ ISR( TIMER2_COMP_vect )
 	{
 		checkDCF = true;
 	}
-
+	
+	if ( alert.ring == 0 )
+	{
+		if ( DCF77_DATA )
+		{
+			HEARTBEAT_LED_OFF;
+		}
+		else
+		{
+			HEARTBEAT_LED_ON;
+		}
+	}
+	
 	sys.blinkCnt++;
 }
 

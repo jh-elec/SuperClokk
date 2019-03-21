@@ -13,20 +13,14 @@
 
 void ht1632c_init(uint8_t bright)  // Initialization for HT1632C
 {
-	csreg	|= (1 << cspin);
-	csport	|= (1 << cspin);
-	
-	wrreg	|= (1 << wrpin);
-	dtreg	|= (1 << dtpin);
-		
 	uint8_t cnfg[] =
 	{
-		0x01,	// System aktivieren
-		0x03,	// LED´s einschalten
-		0x08,	// Blinken ausschalten
-		0x18,	// 1632C Master Mode
-		0x20,	// N-MOS Open Drain und 32 Reihen x 8 Spalten
-		bright,	// Helligkeit
+		HT1632_SYS_EN,			// System aktivieren
+		HT1632_LED_ON,			// LED´s einschalten
+		HT1632_BLINK_OFF,		// Blinken ausschalten
+		HT1632_RC_MASTER_MODE,	// 1632C Master Mode
+		HT1632_COM_OPTION,		// N-MOS Open Drain und 32 Reihen x 8 Spalten
+		bright,					// Helligkeit
 	};
 	
 	for ( uint8_t i = 0 ; i < sizeof(cnfg) / sizeof(cnfg[0]) ; i++ )
@@ -37,28 +31,28 @@ void ht1632c_init(uint8_t bright)  // Initialization for HT1632C
 
 void ht1632c_chipselect()
 {
-	csport &= ~(1<< cspin);
+	HT1632_CS_PORT &= ~(1<< HT1632_CS_BP);
 }
 
 void ht1632c_chipfree()
 {
-	csport |= (1<< cspin);
+	HT1632_CS_PORT |= (1<< HT1632_CS_BP);
 }
 
 void ht1632c_send_to_display (uint8_t data_to_send, uint8_t dtlen)
 {
     while (dtlen) 
 	{
-		wrport &= ~(1 << wrpin);
+		HT1632_WR_PORT &= ~(1 << HT1632_WR_BP);
 		if (data_to_send & dtlen)
 		{
-			dtport |= (1 << dtpin);
+			HT1632_DT_PORT |= (1 << HT1632_DT_BP);
 		}
 		else
 		{
-			dtport &= ~(1 << dtpin);
+			HT1632_DT_PORT &= ~(1 << HT1632_DT_BP);
 		}
-		wrport |= (1 << wrpin);
+		HT1632_WR_PORT |= (1 << HT1632_WR_BP);
 		dtlen >>= 1;
     }
 }
