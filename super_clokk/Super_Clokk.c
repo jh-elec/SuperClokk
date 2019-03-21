@@ -1393,10 +1393,13 @@ uint8_t dcf77StartScan			( void )
 	syncDCF				= true;
 	dcf77ScanIsActive	= true;
 	
-	MATRIX_LEDS_OFF;
+
+	//MATRIX_LEDS_OFF;
+	putStr( "Sync.." , 0 );
+	ht1632c_send_page();
 		
 	uint8_t i;
-
+	
 	for ( i = 0 ; ( i < ram.byte8[DCF77_NUM_OF_RECORDS] ) && ( ! ( state ) ) ; i++ )	
 	{
 		while ( ( dcfNewData == 0 ) && ( flag.alertEnable == 0 ) && ( state == 0 ) )
@@ -1541,18 +1544,18 @@ uint8_t dcf77StartScan			( void )
 			*	Der Fehlerkode besteht aus den vergleichen empfangener
 			*	Streams
 			*/
+			strcpy( errStr , "Sync. Error" );
 			if ( i > 1 )
 			{
-				strcpy( errStr , "Sync. Error - State.: " );
+				strcat( errStr , " - State.: ");
 				strcat( errStr , decHex8( state , buff ) );
 				strcat( errStr , " Cmp.: ");
 				for ( uint8_t y = 0 ; y < i ; y++ )
 				{
 					strcat( errStr , " " );
 					strcat( errStr , decHex8( cmp[y] , buff ) );
-				}
-				scroll_display( errStr , INFO_SCROLL_SPEED);				
-			}
+				}					
+			}scroll_display( errStr , INFO_SCROLL_SPEED);
 			
 			#ifdef _DEBUG
 			for ( uint8_t y = 0 ; y < i ; y++ )
@@ -2848,9 +2851,9 @@ int main( void )
 				_delay_ms(100);
 			}// end for
 						
-			scrollDate( &rx8564 , TEMP_PRESS_DATE_SCROLL_SPEED);
-			scrollTemperature (TEMP_PRESS_DATE_SCROLL_SPEED);
-			scrollPressure(TEMP_PRESS_DATE_SCROLL_SPEED);
+			//scrollDate( &rx8564 , TEMP_PRESS_DATE_SCROLL_SPEED);
+			//scrollTemperature (TEMP_PRESS_DATE_SCROLL_SPEED);
+			//scrollPressure(TEMP_PRESS_DATE_SCROLL_SPEED);
 			
 			#ifdef _DEBUG
 			//ScrollDebugMsg( &DCF77Debug );

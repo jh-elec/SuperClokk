@@ -48,7 +48,7 @@
         <InterfaceName>ISP</InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
-      <ToolNumber>0000A0004174</ToolNumber>
+      <ToolNumber>000200063541</ToolNumber>
       <ToolName>AVRISP mkII</ToolName>
     </com_atmel_avrdbg_tool_ispmk2>
     <com_atmel_avrdbg_tool_avrdragon>
@@ -63,7 +63,7 @@
       <ToolName>AVR Dragon</ToolName>
     </com_atmel_avrdbg_tool_avrdragon>
     <ExternalProgrammingToolCommand />
-    <avrtoolserialnumber>0000A0004174</avrtoolserialnumber>
+    <avrtoolserialnumber>000200063541</avrtoolserialnumber>
     <avrdeviceexpectedsignature>0x1E9502</avrdeviceexpectedsignature>
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions>
