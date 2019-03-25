@@ -1393,10 +1393,7 @@ uint8_t dcf77StartScan			( void )
 	syncDCF				= true;
 	dcf77ScanIsActive	= true;
 	
-
-	//MATRIX_LEDS_OFF;
-	putStr( "Sync.." , 0 );
-	ht1632c_send_page();
+	MATRIX_LEDS_OFF;
 		
 	uint8_t i;
 	
