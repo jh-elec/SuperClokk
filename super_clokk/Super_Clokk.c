@@ -2667,8 +2667,9 @@ uint8_t menueDate			( void )
 }
 
 
+
 int main( void )
-{	
+{		
 	/*	DCF77 Abgleich
 	*	Mit der Variable werden die verstrichenen Minuten gezählt 
 	*	bis zur nächsten Synchronisation

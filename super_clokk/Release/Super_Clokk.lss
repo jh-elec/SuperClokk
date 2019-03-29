@@ -12147,7 +12147,7 @@ Anfang:
 	*/
 	HEARTBEAT_LED_OFF;
     4cd2:	94 9a       	sbi	0x12, 4	; 18
-{	
+{		
 	/*	DCF77 Abgleich
 	*	Mit der Variable werden die verstrichenen Minuten gezählt 
 	*	bis zur nächsten Synchronisation
@@ -12183,7 +12183,7 @@ Anfang:
 		if (oldSyncTime != rx8564.minute )
     4ce8:	d8 2e       	mov	r13, r24
     4cea:	01 c0       	rjmp	.+2      	; 0x4cee <main+0x100>
-{	
+{		
 	/*	DCF77 Abgleich
 	*	Mit der Variable werden die verstrichenen Minuten gezählt 
 	*	bis zur nächsten Synchronisation
