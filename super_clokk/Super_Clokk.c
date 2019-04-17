@@ -624,6 +624,47 @@ void ledarray_shift_up			( void )
 	}
 }
 
+//BETA
+
+enum ShiftDirection 
+{	
+	SHIFT_UP,
+	SHIFT_DOWN,
+	__MAX_SHIFT__
+};
+
+
+void LedArrayShiftUpDown ( enum ShiftDirection Direction , uint8_t Position )
+{
+	switch( Direction )
+	{
+		case SHIFT_UP:
+		{
+			uint8_t y,x;
+			for( y = 0 ; y < ( ROWS-1 ) ; y++ ) // 8
+			{
+				for( x = 0 ; x < COLS ; x++ ) // 32
+				{
+					ht1632c_set( x , y , ht1632c_get( x , y+1 ) );
+				}
+			}			
+		}break;	
+		
+		case SHIFT_DOWN:
+		{
+			uint8_t y,x;
+			for( y = ( ROWS-1 ) ; y > 0 ; y-- )
+			{
+				for( x = 0 ; x < COLS ; x++ )
+				{
+					ht1632c_set( x , y , ht1632c_get( x , y-1 ) );
+				}
+			}	
+		}break;
+	}
+}
+
+
 void ledarray_twinkle			( void ) 
 {
 	uint8_t y, x, ct;
@@ -2721,6 +2762,9 @@ int main( void )
 	
 	loadeep		();
 	i2c_init	();
+	
+	rtcSetClkOut( F_1Hz );
+	
 	bmp180Init	();
 
 	/*	Uhrzeit
@@ -2733,8 +2777,6 @@ int main( void )
 	scroll_display	(">>Start Super Clokk<<", 10);
 	scroll_display	( buildVer() , 20		);
 	clearDisplay	( true , false			);
-
-	
 
 	if ( !flag.isInit )
 	{
@@ -2849,9 +2891,9 @@ int main( void )
 				_delay_ms(100);
 			}// end for
 						
-			//scrollDate( &rx8564 , TEMP_PRESS_DATE_SCROLL_SPEED);
-			//scrollTemperature (TEMP_PRESS_DATE_SCROLL_SPEED);
-			//scrollPressure(TEMP_PRESS_DATE_SCROLL_SPEED);
+			scrollDate( &rx8564 , TEMP_PRESS_DATE_SCROLL_SPEED);
+			scrollTemperature (TEMP_PRESS_DATE_SCROLL_SPEED);
+			scrollPressure(TEMP_PRESS_DATE_SCROLL_SPEED);
 			
 			#ifdef _DEBUG
 			//ScrollDebugMsg( &DCF77Debug );
