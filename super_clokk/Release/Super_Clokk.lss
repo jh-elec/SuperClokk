@@ -4164,7 +4164,7 @@ uint16_t				rtcGetDays				( const uint16_t year )
     1932:	df 05       	cpc	r29, r15
     1934:	d1 f7       	brne	.-12     	; 0x192a <rtcGetData+0x42>
     1936:	0e 94 0d 02 	call	0x41a	; 0x41a <i2c_readNak>
-    193a:	80 93 26 04 	sts	0x0426, r24	; 0x800426 <newHourDelay.3858>
+    193a:	80 93 26 04 	sts	0x0426, r24	; 0x800426 <newHourDelay.3859>
     193e:	0e 94 e9 01 	call	0x3d2	; 0x3d2 <i2c_stop>
     1942:	eb e1       	ldi	r30, 0x1B	; 27
     1944:	f4 e0       	ldi	r31, 0x04	; 4
@@ -7174,20 +7174,20 @@ uint8_t get_key_short			( uint8_t key_mask )
     3148:	c8 2f       	mov	r28, r24
     314a:	80 91 98 04 	lds	r24, 0x0498	; 0x800498 <rx8564+0x1>
     314e:	0e 94 9d 0b 	call	0x173a	; 0x173a <rtcBcdToDec>
-    3152:	90 91 2c 04 	lds	r25, 0x042C	; 0x80042c <alarmReleaseMinOld.3408>
+    3152:	90 91 2c 04 	lds	r25, 0x042C	; 0x80042c <alarmReleaseMinOld.3409>
     3156:	89 17       	cp	r24, r25
     3158:	09 f4       	brne	.+2      	; 0x315c <compareTime+0x64>
     315a:	5b c0       	rjmp	.+182    	; 0x3212 <compareTime+0x11a>
-    315c:	80 93 2c 04 	sts	0x042C, r24	; 0x80042c <alarmReleaseMinOld.3408>
-    3160:	90 91 2b 04 	lds	r25, 0x042B	; 0x80042b <alarmReleaseMinCnt.3409>
+    315c:	80 93 2c 04 	sts	0x042C, r24	; 0x80042c <alarmReleaseMinOld.3409>
+    3160:	90 91 2b 04 	lds	r25, 0x042B	; 0x80042b <alarmReleaseMinCnt.3410>
     3164:	9f 5f       	subi	r25, 0xFF	; 255
     3166:	9b 30       	cpi	r25, 0x0B	; 11
     3168:	18 f4       	brcc	.+6      	; 0x3170 <compareTime+0x78>
-    316a:	90 93 2b 04 	sts	0x042B, r25	; 0x80042b <alarmReleaseMinCnt.3409>
+    316a:	90 93 2b 04 	sts	0x042B, r25	; 0x80042b <alarmReleaseMinCnt.3410>
     316e:	51 c0       	rjmp	.+162    	; 0x3212 <compareTime+0x11a>
-    3170:	10 92 2b 04 	sts	0x042B, r1	; 0x80042b <alarmReleaseMinCnt.3409>
-    3174:	10 92 2a 04 	sts	0x042A, r1	; 0x80042a <lastAlarm.3410+0x1>
-    3178:	10 92 29 04 	sts	0x0429, r1	; 0x800429 <lastAlarm.3410>
+    3170:	10 92 2b 04 	sts	0x042B, r1	; 0x80042b <alarmReleaseMinCnt.3410>
+    3174:	10 92 2a 04 	sts	0x042A, r1	; 0x80042a <lastAlarm.3411+0x1>
+    3178:	10 92 29 04 	sts	0x0429, r1	; 0x800429 <lastAlarm.3411>
     317c:	4a c0       	rjmp	.+148    	; 0x3212 <compareTime+0x11a>
     317e:	91 91       	ld	r25, Z+
     3180:	c9 13       	cpse	r28, r25
@@ -7213,8 +7213,8 @@ uint8_t get_key_short			( uint8_t key_mask )
     31a8:	ac 15       	cp	r26, r12
     31aa:	bd 05       	cpc	r27, r13
     31ac:	79 f4       	brne	.+30     	; 0x31cc <compareTime+0xd4>
-    31ae:	70 93 2a 04 	sts	0x042A, r23	; 0x80042a <lastAlarm.3410+0x1>
-    31b2:	60 93 29 04 	sts	0x0429, r22	; 0x800429 <lastAlarm.3410>
+    31ae:	70 93 2a 04 	sts	0x042A, r23	; 0x80042a <lastAlarm.3411+0x1>
+    31b2:	60 93 29 04 	sts	0x0429, r22	; 0x800429 <lastAlarm.3411>
     31b6:	70 92 b9 04 	sts	0x04B9, r7	; 0x8004b9 <alert+0x3>
     31ba:	d0 93 ba 04 	sts	0x04BA, r29	; 0x8004ba <alert+0x4>
     31be:	80 91 a3 04 	lds	r24, 0x04A3	; 0x8004a3 <flag>
@@ -7242,8 +7242,8 @@ uint8_t get_key_short			( uint8_t key_mask )
     31ee:	29 30       	cpi	r18, 0x09	; 9
     31f0:	31 05       	cpc	r19, r1
     31f2:	29 f6       	brne	.-118    	; 0x317e <compareTime+0x86>
-    31f4:	70 93 2a 04 	sts	0x042A, r23	; 0x80042a <lastAlarm.3410+0x1>
-    31f8:	60 93 29 04 	sts	0x0429, r22	; 0x800429 <lastAlarm.3410>
+    31f4:	70 93 2a 04 	sts	0x042A, r23	; 0x80042a <lastAlarm.3411+0x1>
+    31f8:	60 93 29 04 	sts	0x0429, r22	; 0x800429 <lastAlarm.3411>
     31fc:	70 92 b9 04 	sts	0x04B9, r7	; 0x8004b9 <alert+0x3>
     3200:	d0 93 ba 04 	sts	0x04BA, r29	; 0x8004ba <alert+0x4>
     3204:	80 91 a3 04 	lds	r24, 0x04A3	; 0x8004a3 <flag>
@@ -7257,8 +7257,8 @@ uint8_t get_key_short			( uint8_t key_mask )
     3218:	12 81       	ldd	r17, Z+2	; 0x02
     321a:	73 80       	ldd	r7, Z+3	; 0x03
     321c:	d4 81       	ldd	r29, Z+4	; 0x04
-    321e:	60 91 29 04 	lds	r22, 0x0429	; 0x800429 <lastAlarm.3410>
-    3222:	70 91 2a 04 	lds	r23, 0x042A	; 0x80042a <lastAlarm.3410+0x1>
+    321e:	60 91 29 04 	lds	r22, 0x0429	; 0x800429 <lastAlarm.3411>
+    3222:	70 91 2a 04 	lds	r23, 0x042A	; 0x80042a <lastAlarm.3411+0x1>
     3226:	50 91 a3 04 	lds	r21, 0x04A3	; 0x8004a3 <flag>
     322a:	52 fb       	bst	r21, 2
     322c:	55 27       	eor	r21, r21
@@ -7697,16 +7697,16 @@ void switch_debounce			( void )
     35a8:	28 2f       	mov	r18, r24
     35aa:	29 27       	eor	r18, r25
 	ct0 = ~( ct0 & i );						// reset or count ct0
-    35ac:	90 91 2f 04 	lds	r25, 0x042F	; 0x80042f <ct0.3337>
+    35ac:	90 91 2f 04 	lds	r25, 0x042F	; 0x80042f <ct0.3338>
     35b0:	92 23       	and	r25, r18
     35b2:	89 2f       	mov	r24, r25
     35b4:	80 95       	com	r24
-    35b6:	80 93 2f 04 	sts	0x042F, r24	; 0x80042f <ct0.3337>
+    35b6:	80 93 2f 04 	sts	0x042F, r24	; 0x80042f <ct0.3338>
 	ct1 = ct0 ^ (ct1 & i);					// reset or count ct1
-    35ba:	90 91 2e 04 	lds	r25, 0x042E	; 0x80042e <ct1.3338>
+    35ba:	90 91 2e 04 	lds	r25, 0x042E	; 0x80042e <ct1.3339>
     35be:	92 23       	and	r25, r18
     35c0:	98 27       	eor	r25, r24
-    35c2:	90 93 2e 04 	sts	0x042E, r25	; 0x80042e <ct1.3338>
+    35c2:	90 93 2e 04 	sts	0x042E, r25	; 0x80042e <ct1.3339>
     35c6:	82 23       	and	r24, r18
 	i &= ct0 & ct1;							// count until roll over ?
     35c8:	89 23       	and	r24, r25
@@ -7728,17 +7728,17 @@ void switch_debounce			( void )
 	rpt = 50;								// start delay
 	if(--rpt == 0 )
     35e0:	81 e3       	ldi	r24, 0x31	; 49
-    35e2:	80 93 2d 04 	sts	0x042D, r24	; 0x80042d <rpt.3339>
+    35e2:	80 93 2d 04 	sts	0x042D, r24	; 0x80042d <rpt.3340>
     35e6:	11 c0       	rjmp	.+34     	; 0x360a <switch_debounce+0x6c>
-    35e8:	80 91 2d 04 	lds	r24, 0x042D	; 0x80042d <rpt.3339>
+    35e8:	80 91 2d 04 	lds	r24, 0x042D	; 0x80042d <rpt.3340>
     35ec:	81 50       	subi	r24, 0x01	; 1
     35ee:	19 f0       	breq	.+6      	; 0x35f6 <switch_debounce+0x58>
-    35f0:	80 93 2d 04 	sts	0x042D, r24	; 0x80042d <rpt.3339>
+    35f0:	80 93 2d 04 	sts	0x042D, r24	; 0x80042d <rpt.3340>
     35f4:	0a c0       	rjmp	.+20     	; 0x360a <switch_debounce+0x6c>
 	{
 		rpt = 15;                            // repeat delay
     35f6:	8f e0       	ldi	r24, 0x0F	; 15
-    35f8:	80 93 2d 04 	sts	0x042D, r24	; 0x80042d <rpt.3339>
+    35f8:	80 93 2d 04 	sts	0x042D, r24	; 0x80042d <rpt.3340>
 		sys.key_rpt |= sys.key_state & (0b01111100);
     35fc:	e4 ea       	ldi	r30, 0xA4	; 164
     35fe:	f4 e0       	ldi	r31, 0x04	; 4
@@ -12524,16 +12524,16 @@ ISR( TIMER0_COMP_vect )
 	static uint16_t newHourDelay = 0;
 		
 	if ( ++delay >= 40 )
-    4eb4:	80 91 28 04 	lds	r24, 0x0428	; 0x800428 <delay.3857>
+    4eb4:	80 91 28 04 	lds	r24, 0x0428	; 0x800428 <delay.3858>
     4eb8:	8f 5f       	subi	r24, 0xFF	; 255
-    4eba:	80 93 28 04 	sts	0x0428, r24	; 0x800428 <delay.3857>
+    4eba:	80 93 28 04 	sts	0x0428, r24	; 0x800428 <delay.3858>
     4ebe:	88 32       	cpi	r24, 0x28	; 40
     4ec0:	20 f0       	brcs	.+8      	; 0x4eca <__vector_10+0x38>
 	{
 		compareTime();	
     4ec2:	0e 94 7c 18 	call	0x30f8	; 0x30f8 <compareTime>
 		delay = 0x00;	
-    4ec6:	10 92 28 04 	sts	0x0428, r1	; 0x800428 <delay.3857>
+    4ec6:	10 92 28 04 	sts	0x0428, r1	; 0x800428 <delay.3858>
 	}
 
 	if ( ! ( dcf77ScanIsActive ) )
@@ -12577,11 +12577,11 @@ ISR( TIMER0_COMP_vect )
     4f0c:	3f c0       	rjmp	.+126    	; 0x4f8c <__vector_10+0xfa>
 	{	
 		if ( ++newHourDelay >= 0 )
-    4f0e:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3858>
-    4f12:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3858+0x1>
+    4f0e:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3859>
+    4f12:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3859+0x1>
     4f16:	01 96       	adiw	r24, 0x01	; 1
-    4f18:	90 93 27 04 	sts	0x0427, r25	; 0x800427 <newHourDelay.3858+0x1>
-    4f1c:	80 93 26 04 	sts	0x0426, r24	; 0x800426 <newHourDelay.3858>
+    4f18:	90 93 27 04 	sts	0x0427, r25	; 0x800427 <newHourDelay.3859+0x1>
+    4f1c:	80 93 26 04 	sts	0x0426, r24	; 0x800426 <newHourDelay.3859>
 		{
 			if ( flag.soundEnable )
     4f20:	80 91 a3 04 	lds	r24, 0x04A3	; 0x8004a3 <flag>
@@ -12601,8 +12601,8 @@ ISR( TIMER0_COMP_vect )
 		}
 			
 		if ( newHourDelay >= 5 )
-    4f32:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3858>
-    4f36:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3858+0x1>
+    4f32:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3859>
+    4f36:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3859+0x1>
     4f3a:	05 97       	sbiw	r24, 0x05	; 5
     4f3c:	30 f0       	brcs	.+12     	; 0x4f4a <__vector_10+0xb8>
 		{
@@ -12621,8 +12621,8 @@ ISR( TIMER0_COMP_vect )
 
 			
 		if ( newHourDelay >= 25 )
-    4f4a:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3858>
-    4f4e:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3858+0x1>
+    4f4a:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3859>
+    4f4e:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3859+0x1>
     4f52:	49 97       	sbiw	r24, 0x19	; 25
     4f54:	48 f0       	brcs	.+18     	; 0x4f68 <__vector_10+0xd6>
 		{
@@ -12645,16 +12645,16 @@ ISR( TIMER0_COMP_vect )
 		}
 			
 		if ( newHourDelay >= 30 )
-    4f68:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3858>
-    4f6c:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3858+0x1>
+    4f68:	80 91 26 04 	lds	r24, 0x0426	; 0x800426 <newHourDelay.3859>
+    4f6c:	90 91 27 04 	lds	r25, 0x0427	; 0x800427 <newHourDelay.3859+0x1>
     4f70:	4e 97       	sbiw	r24, 0x1e	; 30
     4f72:	60 f0       	brcs	.+24     	; 0x4f8c <__vector_10+0xfa>
 		{
 			sys.alertNewHour	= 0;
     4f74:	10 92 a9 04 	sts	0x04A9, r1	; 0x8004a9 <sys+0x5>
 			newHourDelay		= 0;
-    4f78:	10 92 27 04 	sts	0x0427, r1	; 0x800427 <newHourDelay.3858+0x1>
-    4f7c:	10 92 26 04 	sts	0x0426, r1	; 0x800426 <newHourDelay.3858>
+    4f78:	10 92 27 04 	sts	0x0427, r1	; 0x800427 <newHourDelay.3859+0x1>
+    4f7c:	10 92 26 04 	sts	0x0426, r1	; 0x800426 <newHourDelay.3859>
 			ALARM_SOUND_OFF;
     4f80:	c4 98       	cbi	0x18, 4	; 24
 			

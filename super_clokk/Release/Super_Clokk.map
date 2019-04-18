@@ -1435,11 +1435,11 @@ END GROUP
  .rodata.str1.1
                 0x0080015d      0x299 Super_Clokk.o
                                 0x29e (size before relaxing)
- .rodata.days.3816
+ .rodata.days.3817
                 0x008003f6        0xe Super_Clokk.o
- .rodata.timeFormat.3815
+ .rodata.timeFormat.3816
                 0x00800404        0x4 Super_Clokk.o
- .rodata.msg.3814
+ .rodata.msg.3815
                 0x00800408        0x6 Super_Clokk.o
  *(.gnu.linkonce.d*)
                 0x0080040e                . = ALIGN (0x2)
@@ -1458,19 +1458,19 @@ END GROUP
                 0x00800412        0x1 dcf.o
  .bss.dcf_data  0x00800413        0x8 dcf.o
  .bss.buff      0x0080041b        0xb rx8564.o
- .bss.newHourDelay.3858
+ .bss.newHourDelay.3859
                 0x00800426        0x2 Super_Clokk.o
- .bss.delay.3857
+ .bss.delay.3858
                 0x00800428        0x1 Super_Clokk.o
- .bss.lastAlarm.3410
+ .bss.lastAlarm.3411
                 0x00800429        0x2 Super_Clokk.o
- .bss.alarmReleaseMinCnt.3409
+ .bss.alarmReleaseMinCnt.3410
                 0x0080042b        0x1 Super_Clokk.o
- .bss.alarmReleaseMinOld.3408
+ .bss.alarmReleaseMinOld.3409
                 0x0080042c        0x1 Super_Clokk.o
- .bss.rpt.3339  0x0080042d        0x1 Super_Clokk.o
- .bss.ct1.3338  0x0080042e        0x1 Super_Clokk.o
- .bss.ct0.3337  0x0080042f        0x1 Super_Clokk.o
+ .bss.rpt.3340  0x0080042d        0x1 Super_Clokk.o
+ .bss.ct1.3339  0x0080042e        0x1 Super_Clokk.o
+ .bss.ct0.3338  0x0080042f        0x1 Super_Clokk.o
  .bss.menueCursor
                 0x00800430        0x1 Super_Clokk.o
                 0x00800430                menueCursor

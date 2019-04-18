@@ -628,38 +628,37 @@ void ledarray_shift_up			( void )
 
 enum ShiftDirection 
 {	
-	SHIFT_UP,
-	SHIFT_DOWN,
+	SHIFT_UP		,
+	SHIFT_DOWN		,
 	__MAX_SHIFT__
 };
 
 
 void LedArrayShiftUpDown ( enum ShiftDirection Direction , uint8_t Position )
 {
+	uint8_t y,x;	
+	
 	switch( Direction )
 	{
 		case SHIFT_UP:
 		{
-			uint8_t y,x;
-			for( y = 0 ; y < ( ROWS-1 ) ; y++ ) // 8
+			for( y = 0 ; y < ( ROWS - 1 ) ; y++ ) // Anz. original = 8
 			{
-				for( x = 0 ; x < COLS ; x++ ) // 32
-				{
-					ht1632c_set( x , y , ht1632c_get( x , y+1 ) );
-				}
+				//ht1632c_set( x , y , ht1632c_get( x , y + 1 ) );
+				ht1632c_set( x , y , ht1632c_get( x , y + 1 ) );
 			}			
 		}break;	
 		
 		case SHIFT_DOWN:
 		{
-			uint8_t y,x;
-			for( y = ( ROWS-1 ) ; y > 0 ; y-- )
+			for( y = ( ROWS - 1 ) ; y > 0 ; y-- ) // Anz. original = 8
 			{
-				for( x = 0 ; x < COLS ; x++ )
-				{
-					ht1632c_set( x , y , ht1632c_get( x , y-1 ) );
-				}
+				//ht1632c_set( x , y , ht1632c_get( x , y - 1 ) );
+				ht1632c_set( x , y , ht1632c_get( x , y - 1 ) );
 			}	
+		}break;
+		
+		case __MAX_SHIFT__:{
 		}break;
 	}
 }
