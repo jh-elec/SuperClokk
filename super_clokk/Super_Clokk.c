@@ -149,7 +149,7 @@
 	 __ALERT_MAX__
  }alert_e;
  
-rx8564_t rx8564; 
+ rx8564_t rx8564; 
  
 typedef struct
 {	
@@ -213,7 +213,10 @@ typedef struct
 	uint16_t   blinkCnt , 
 			   menueTimeout;
 	
+	uint8_t	   TimeOld[2];
+	
 }system_t; volatile system_t sys;
+
 
 
 uint8_t reboot(void)
@@ -625,16 +628,16 @@ void ledarray_shift_up			( void )
 }
 
 //BETA
-
 enum ShiftDirection 
 {	
 	SHIFT_UP		,
 	SHIFT_DOWN		,
+	
+	
 	__MAX_SHIFT__
 };
 
-
-void LedArrayShiftUpDown ( enum ShiftDirection Direction , uint8_t Position )
+void LedArrayShiftUpDown ( enum ShiftDirection Direction , uint8_t PositionBeginn , uint8_t PositionEnd )
 {
 	uint8_t y,x;	
 	
@@ -642,27 +645,43 @@ void LedArrayShiftUpDown ( enum ShiftDirection Direction , uint8_t Position )
 	{
 		case SHIFT_UP:
 		{
-			for( y = 0 ; y < ( ROWS - 1 ) ; y++ ) // Anz. original = 8
+			for( y = 0 ; y < ROWS - 1 ; y++ )
 			{
-				//ht1632c_set( x , y , ht1632c_get( x , y + 1 ) );
-				ht1632c_set( x , y , ht1632c_get( x , y + 1 ) );
-			}			
+				for( x = PositionBeginn ; x < PositionEnd ; x++ )
+				{
+					ht1632c_set( x , y , ht1632c_get( x , y + 1 ) );
+				}
+			}	
+			
+			for( x = PositionBeginn ; x < PositionEnd ; x++ )
+			{
+				ht1632c_set( x , ( ROWS - 1 ) , 0 );
+			}
+				
 		}break;	
 		
 		case SHIFT_DOWN:
 		{
-			for( y = ( ROWS - 1 ) ; y > 0 ; y-- ) // Anz. original = 8
+			for( y = ( ROWS - 1 ) ; y > 0 ; y-- )
 			{
-				//ht1632c_set( x , y , ht1632c_get( x , y - 1 ) );
-				ht1632c_set( x , y , ht1632c_get( x , y - 1 ) );
-			}	
+				for( x = 0 ; x < 5 ; x++ )
+				{
+					ht1632c_set( x , y , ht1632c_get( x , y - 1 ) );
+				}
+			}
+			
+			for(x=0;x<COLS;x++)
+			{
+				ht1632c_set(x,0,0);
+			}
+			
 		}break;
 		
 		case __MAX_SHIFT__:{
 		}break;
 	}
 }
-
+//END OF BETA
 
 void ledarray_twinkle			( void ) 
 {
@@ -1380,6 +1399,9 @@ uint8_t cnfgTime_				( uint8_t *buff )
     sys.autoChangeSec	= 0;
     button.all      = 0;
 
+	sys.TimeOld[0] = rx8564.minute;
+	sys.TimeOld[1] = rx8564.hour;
+
     return 0;
 }
 
@@ -1424,8 +1446,8 @@ uint8_t dcf77StartScan			( void )
 		return 1;
 	}
 	
-	Dcf77Debug_t *Dcf77ScanDebug = malloc( ram.byte8[DCF77_NUM_OF_RECORDS] * sizeof(Dcf77Debug_t) );
-	if ( Dcf77ScanDebug == NULL )
+	Dcf77Debug_t *structDcf77ScanDebug = malloc( ram.byte8[DCF77_NUM_OF_RECORDS] * sizeof(Dcf77Debug_t) );
+	if ( structDcf77ScanDebug == NULL )
 	{
 		return 2;
 	}
@@ -1450,7 +1472,7 @@ uint8_t dcf77StartScan			( void )
 			if ( checkDCF )
 			{
 				checkDCF = false;			
-				dcf_check( &Dcf77ScanDebug[i] );
+				dcf_check( &structDcf77ScanDebug[i] );
 			}
 		
 			if ( SWITCH_EXIT_PRESSED )
@@ -1600,7 +1622,7 @@ uint8_t dcf77StartScan			( void )
 				char Tmp[] = { '<' , (1+y) + '0' , '.' , '.' , i + '0' , '>' , ' ' , '\0' };
 				scroll_display( "Scan " , 35 );
 				scroll_display( Tmp , 35);
-				ScrollDebugMsg( &Dcf77ScanDebug[y] );
+				ScrollDebugMsg( &structDcf77ScanDebug[y] );
 			}
 			#endif
 			
@@ -1621,7 +1643,7 @@ uint8_t dcf77StartScan			( void )
 	
 	free( (dcfRec_t*) dcfRec );
 	
-	free( (Dcf77Debug_t*) Dcf77ScanDebug );
+	free( (Dcf77Debug_t*) structDcf77ScanDebug );
 	
 	/*	DCF77
 	*	Aufnahme ist beendet
@@ -2706,8 +2728,6 @@ uint8_t menueDate			( void )
 	return 0;
 }
 
-
-
 int main( void )
 {		
 	/*	DCF77 Abgleich
@@ -2809,6 +2829,9 @@ int main( void )
 	*/
 	HEARTBEAT_LED_OFF;
 	
+	sys.TimeOld[0] = rx8564.minute;
+	sys.TimeOld[1] = rx8564.hour;
+	
     while( 1 )
     {
 		alarmRoutine();
@@ -2854,9 +2877,42 @@ int main( void )
 			button.all = 0;
 		}
 		
+		putTimertcBcdToDec( rx8564.hour , rx8564.minute );
 		doublePointOn();
-		putTimertcBcdToDec( rx8564.hour , rx8564.minute );		
 
+		if ( sys.TimeOld[0] != rx8564.minute )
+		{
+			if ( !( rtcBcdToDec( rx8564.minute ) % 10) )
+			{
+				for ( uint8_t ui = 0 ; ui < 8 ; ui++ )
+				{
+					if ( sys.TimeOld[1] != rx8564.hour )
+					{
+						LedArrayShiftUpDown( SHIFT_UP , 0 , 15 );
+					}
+					
+					LedArrayShiftUpDown( SHIFT_UP , 18 , 32 );
+					_delay_ms(75);
+				}
+			}
+			else
+			{
+				for ( uint8_t ui = 0 ; ui < 8 ; ui++ )
+				{
+					if ( sys.TimeOld[1] != rx8564.hour )
+					{
+						LedArrayShiftUpDown( SHIFT_UP , 8 , 15 );
+					}
+					
+					LedArrayShiftUpDown( SHIFT_UP , 24 , 32 );
+					_delay_ms(75);
+				}
+			}
+			
+			sys.TimeOld[0] = rx8564.minute;
+			sys.TimeOld[1] = rx8564.hour;
+		}
+				
 		sys.autoChangeNew = rx8564.second;
 		if ( sys.autoChangeNew != sys.autoChangeOld)
 		{
@@ -2897,6 +2953,9 @@ int main( void )
 			#ifdef _DEBUG
 			//ScrollDebugMsg( &DCF77Debug );
 			#endif 
+		
+			sys.TimeOld[0] = rx8564.minute;
+			sys.TimeOld[1] = rx8564.hour;
 		
 		}// end if
 				
