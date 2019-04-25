@@ -745,6 +745,39 @@ void getFont					( char match, char *buff )
 	return;
 }
 
+//BETA
+void ScrollCharUp ( char c , uint8_t offset )
+{
+	char buff[7];
+	getFont(c, buff);
+
+	uint8_t width = buff[1];
+	uint8_t y, x;
+	
+	for(y=0; y<ROWS; y++)
+	{
+		for(x=0; x<width; x++)
+		{
+			if((offset + x) < COLS)
+			{
+				if( (buff[2+x] & (1<<((ROWS-1)-y))) != 0)
+				{
+					ht1632c_set(offset + x,y,1);
+				}
+				else
+				{
+					ht1632c_set(offset + x,y,0);
+				}
+			}
+		}
+	}
+
+	for(y=0; y<ROWS; y++)
+	{
+		ht1632c_set(offset+width,y, 0);
+	}
+}
+
 void putChar					( char c , uint8_t offset ) 
 {
 	char buff[7];

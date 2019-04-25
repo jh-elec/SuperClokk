@@ -93,14 +93,15 @@ uint8_t ht1632c_get(uint8_t x, uint8_t y)
     uint8_t bitval;
     int addr;
 
-    if ((x < 0) || (y < 0) || (x > (COLS-1)) || (y > (ROWS-1))) 
-	{
-      return 0;
-    }
+//     if ((x < 0) || (y < 0) || (x > (COLS-1)) || (y > (ROWS-1))) 
+// 	{
+//       return 0;
+//     }
  
     bitval = 8>>(x&3);  // compute which bit will need set (Will equal 1, 2, 4, or 8)
-    addr = ((x>>3)<<4)+(y<<1)+((x&4)>>2);  // compute which memory word this is in
-  
+    //addr = ((x>>3)<<4)+(y<<1)+((x&4)>>2);  // compute which memory word this is in
+	addr = ((x & 0xF8)<<1)|(y<<1)|((x>>2)&1); // compute which memory word this is in
+	
     if((ht1632_shadowram[addr] & bitval) != 0) 
 	{
       return 1;
@@ -141,9 +142,9 @@ void ht1632c_set(uint8_t x, uint8_t y, uint8_t val)
 	*	Bits 0-2 (alle) von y auf 1-3
 	*	Bit    2 von x auf 0
 	*/
+	//addr = ((x>>3)<<4)+(y<<1)+((x&4)>>2);
 	addr = ((x & 0xF8)<<1)|(y<<1)|((x>>2)&1); // compute which memory word this is in
-	//addr = ((x>>3)<<4)+(y<<1)+((x&4)>>2);  
-  
+	  
     if (val) // Modify the shadow memory
 	{  
       ht1632_shadowram[addr] |= bitval;
