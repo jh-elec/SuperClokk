@@ -77,8 +77,9 @@ enum Ht1632_Pwm_Duty_Commandos_Enum
 	__HT1632_PWM_DUTY_MAX__
 };
 
+#define _HT1632_COLS_	( ( COLS * ROWS ) / 4 )
 
-volatile uint8_t ht1632_shadowram[ ( COLS * ROWS ) / 4 ];
+volatile uint8_t ht1632_shadowram[ _HT1632_COLS_ ];
 
 void ht1632c_send_page ();
 void ht1632cSendCmd (uint8_t command);

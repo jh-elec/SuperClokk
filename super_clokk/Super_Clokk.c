@@ -752,6 +752,7 @@ void putChar					( char c , uint8_t offset )
 
 	uint8_t width = buff[1];
 	uint8_t y, x;
+	
 	for(y=0; y<ROWS; y++) 
 	{
 		for(x=0; x<width; x++) 
@@ -1407,6 +1408,8 @@ uint8_t cnfgTime_				( uint8_t *buff )
 
 uint8_t dcf77StartScan			( void )
 {			
+	HEARTBEAT_LED_ON;
+	
 	uint8_t	dcfTmeOut = 0 , dcfTmeOutOld = 0;
 
 	#ifdef _DEBUG
@@ -3081,18 +3084,6 @@ ISR( TIMER2_COMP_vect )
 	if ( dcf77ScanIsActive )
 	{
 		checkDCF = true;
-	}
-	
-	if ( alert.ring == 0 )
-	{
-		if ( DCF77_DATA )
-		{
-			HEARTBEAT_LED_OFF;
-		}
-		else
-		{
-			HEARTBEAT_LED_ON;
-		}
 	}
 	
 	sys.blinkCnt++;

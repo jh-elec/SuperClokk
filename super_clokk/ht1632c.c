@@ -63,7 +63,7 @@ void ht1632c_send_page( void )
 	ht1632c_chipselect();
 	ht1632c_send_to_display( 0b101 , 1<<2 );
 	ht1632c_send_to_display( 0 , 1<<6 );
-	for( addr = 0 ; addr < 64 ; addr++ )
+	for( addr = 0 ; addr < _HT1632_COLS_ ; addr++ )
 	{
 		ht1632c_send_to_display( ht1632_shadowram[addr] , 1<<3 );
 	}
@@ -116,12 +116,33 @@ void ht1632c_set(uint8_t x, uint8_t y, uint8_t val)
     uint8_t bitval;
     int addr;
 
-    if ((x < 0) || (y < 0) || (x > 31) || (y > 7)) 
-	{
-      return;
-    }
+//  if ((x < 0) || (y < 0) || (x > 31) || (y > 7)) 
+// 	{
+//		return;
+//  }
+	
+	/*
+	*  0 & 3 -> 0
+	*  1 & 3 -> 1
+	*  2 & 3 -> 2
+	*  3 & 3 -> 3
+	*  4 & 3 -> 0
+	*  5 & 3 -> 1
+	*  6 & 3 -> 2
+	*  7 & 3 -> 3
+	*	.. usw
+	*/
     bitval = 8>>(x&3);  // compute which bit will need set (Will equal 1, 2, 4, or 8)
-    addr = ((x>>3)<<4)+(y<<1)+((x&4)>>2);  // compute which memory word this is in
+    
+	
+	/*
+	*	Bildet die Bits von x und y auf addr ab:
+	*	Bits 3-4 von x auf 4-5
+	*	Bits 0-2 (alle) von y auf 1-3
+	*	Bit    2 von x auf 0
+	*/
+	addr = ((x & 0xF8)<<1)|(y<<1)|((x>>2)&1); // compute which memory word this is in
+	//addr = ((x>>3)<<4)+(y<<1)+((x&4)>>2);  
   
     if (val) // Modify the shadow memory
 	{  
