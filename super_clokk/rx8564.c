@@ -165,31 +165,18 @@ void					rtcGetData				( rx8564_t *buffer )
 	buff[0] = RX8564_SECONDS;
 	rtcRead( buff , sizeof( buff ) );
 			
-    buffer->second			= buff[0];
-    buffer->minute			= buff[1];  
-    buffer->hour			= buff[2];
-    buffer->day				= buff[3];
-    buffer->dayName			= buff[4];
-    buffer->month			= buff[5];
-    buffer->year			= buff[6];
-    buffer->alrt_minute		= buff[7];
-    buffer->alrt_hour		= buff[8];
-    buffer->alrt_day		= buff[9];
-    buffer->alrt_dayName	= buff[10];
+    buffer->second			= buff[0] & 0x7F;
+    buffer->minute			= buff[1] & 0x7F;
+    buffer->hour			= buff[2] & 0x3F;
+    buffer->day				= buff[3] & 0x3F;
+    buffer->dayName			= buff[4] & 0x1F;
+    buffer->month			= buff[5] & 0x07;
+    buffer->year			= buff[6] & 0x7F;
+    buffer->alrt_minute		= buff[7] & 0x7F;
+    buffer->alrt_hour		= buff[8] & 0x7F;
+    buffer->alrt_day		= buff[9] & 0x7F;
+    buffer->alrt_dayName	= buff[10] & 0x7F;
 
- 
-    buffer->second			&= 0x7F;
-    buffer->minute			&= 0x7F;
-    buffer->hour			&= 0x3F;
-          
-    buffer->day				&= 0x3F;
-    buffer->month			&= 0x1F;
-    buffer->dayName			&= 0x07;
-     
-    buffer->alrt_minute		&= 0x7F;
-    buffer->alrt_hour		&= 0x7F;
-    buffer->alrt_day		&= 0x7F;
-    buffer->alrt_dayName	&= 0x7F;
 }
   
 void					rtcSetCtrl2				( uint8_t mask )		
@@ -220,7 +207,7 @@ bool					rtcIsLeapYear			( const uint16_t year )
 {
   // Die Regel lautet: Alles, was durch 4 teilbar ist, ist ein Schaltjahr.
   // Es sei denn, das Jahr ist durch 100 teilbar, dann ist es keins.
-  // Aber wenn es durch 400 teilbar ist, ist es doch wieder eins.
+  // Aber wenn es durch 400 teilbars ist, ist es doch wieder eins.
 
 	if (  (year % 400 ) == 0 )
 	{

@@ -4,7 +4,7 @@
 *		- LED MATRIX ( 8 x 8 x 4 ).
 *		- VIBRATION MOTOR for Alarm.
 *		- SOUND for Alarm.
-*		- Actual Temperature (from BMP180) Range : -40 ... +85 °C 
+*		- Actual Temperature (from BMP180) Range : -40 ... +85 ï¿½C 
 *		- Actual Pressure    (from BMP180) Range : 300 ... 1100hPa 
 *		  HARDWARE DESCRRIPTION.:
 *			
@@ -447,16 +447,21 @@ void ledarray_flash				(uint16_t rate,uint8_t repeats)
 {
 	uint8_t y, x,t;
 
-	for(t=0;t<repeats;t++){
-		for(y=0;y<ROWS;y++) {
-			for(x=0;x<COLS;x++) {
+	for(t=0;t<repeats;t++)
+	{
+		for(y=0;y<ROWS;y++)
+		{
+			for(x=0;x<COLS;x++)
+			{
 				ht1632c_set(x,y, 1 - ht1632c_get(x,y));
 			}
 		}
 		delay_ms(rate/4);
 
-		for(y=0;y<ROWS;y++) {
-			for(x=0;x<COLS;x++) {
+		for(y=0;y<ROWS;y++)
+		{
+			for(x=0;x<COLS;x++)
+			{
 				ht1632c_set(x,y, 1 - ht1632c_get(x,y));
 			}
 		}
@@ -876,7 +881,7 @@ void switch_debounce			( void )
 	
 	if ( get_key_press( 1<<PC2 ) )
 	{
-		button.pressed.menue = 1;	// Menü
+		button.pressed.menue = 1;	// Menï¿½
 		sys.menueTimeout = 0;
 		sys.blinkCnt = 0;
 	}	
@@ -1030,7 +1035,7 @@ void scrollTemperature			( uint8_t speed )
  	/* signed " - " */
  	if (cal.temperature < 0){strcpy(bufff, "Aktuelle Temperatur : -");; cal.temperature  *= (-1);}	
 			
-	sprintf(bufff, "Aktuelle Temperatur: %ld.%ld °C", cal.temperature / 10 , cal.temperature % 10 );
+	sprintf(bufff, "Aktuelle Temperatur: %ld.%ld ï¿½C", cal.temperature / 10 , cal.temperature % 10 );
 			
 	scroll_display(bufff, speed);
 	
@@ -1127,7 +1132,7 @@ void compareTime				( void )
 	
 	/*
 	*	Uhrzeit umrechnen und zwischen speichern
-	*	Damit nicht unnötige Funktionsaufrufe von rtcBcdToDec() entstehen beim vergleichen
+	*	Damit nicht unnï¿½tige Funktionsaufrufe von rtcBcdToDec() entstehen beim vergleichen
 	*/
 	uint8_t hour	= rtcBcdToDec(rx8564.hour);
 	uint8_t minute	= rtcBcdToDec(rx8564.minute);
@@ -1156,7 +1161,7 @@ void compareTime				( void )
 	}
 	
 	/*
-	*	Aktuelle Uhrzeit mit den eingetellten Alarmzeiten überprüfen
+	*	Aktuelle Uhrzeit mit den eingetellten Alarmzeiten ï¿½berprï¿½fen
 	*/
 	for ( uint8_t i = 0 ; i < __ALERT_MAX__ ; i++ )
 	{
@@ -1379,9 +1384,9 @@ uint8_t cnfgTime_				( uint8_t *buff )
 	uint8_t state = 0;
 
     /*
-    *      Werte müssen beim Funktionsaufruf mitgegeben werden..
+    *      Werte mï¿½ssen beim Funktionsaufruf mitgegeben werden..
     *      Anhand der ersten beiden Bytes von "buff" werden die
-    *      maximal Größen von den Werten festgelegt
+    *      maximal Grï¿½ï¿½en von den Werten festgelegt
     */
     uint8_t maxValues[] = { buff[0] , buff[1] }; 
 
@@ -1459,9 +1464,9 @@ uint8_t dcf77StartScan			( void )
 	/*
 	*	Bit		Beschreibung
 	*	
-	*	0	-	Bei welchem Scan wurde ein Timeout ausgelöst [BIT0]
-	*	1	-	Bei welchen Scan wurde ein Timeout ausgelöst [BIT1]
-	*	2	-	Bei welchem Scan wurde ein Timeout ausgelöst [BIT2]
+	*	0	-	Bei welchem Scan wurde ein Timeout ausgelï¿½st [BIT0]
+	*	1	-	Bei welchen Scan wurde ein Timeout ausgelï¿½st [BIT1]
+	*	2	-	Bei welchem Scan wurde ein Timeout ausgelï¿½st [BIT2]
 	*	3	-	Hat der Benutzer den Scan abgebrochen?
 	*/
 	uint8_t state = 0;
@@ -1599,7 +1604,7 @@ uint8_t dcf77StartScan			( void )
 		if ( ! ( cmp[y] ) )
 		{
 			/*
-			*	DCF77_RECORD bestimmt den späteren Wert von
+			*	DCF77_RECORD bestimmt den spï¿½teren Wert von
 			*	'cmpCnt'
 			*/
 			cmpCnt++;
@@ -1667,8 +1672,8 @@ uint8_t dcf77StartScan			( void )
 	}
 		
 	/*
-	*	Sollte während der Funktion eine Taste betätigt wurden sein,
-	*	müssen wir diese vor verlassen noch bestätigen
+	*	Sollte wï¿½hrend der Funktion eine Taste betï¿½tigt wurden sein,
+	*	mï¿½ssen wir diese vor verlassen noch bestï¿½tigen
 	*/
  	button.all = 0;
 	
@@ -1692,7 +1697,7 @@ uint8_t dcf77StartScan			( void )
 void defaultEEP					( void )
 {
 	/*	EEPROM
-	*	Prüfen ob der EEPROM schon initalisiert wurden ist..
+	*	Prï¿½fen ob der EEPROM schon initalisiert wurden ist..
 	*/
 	eeprom_busy_wait();
 	
@@ -2023,7 +2028,7 @@ Anfang:
 	
 	clearDisplay( true , false );
 		
-	uint8_t buff[] = { 23 , 59 , eeprom_read_byte( &eep.byte8[ALERT_HOUR_1 + ret] ) , eeprom_read_byte( &eep.byte8[ALERT_MINUTE_1 + ret] ) }; // Darf nicht verändert werden..
+	uint8_t buff[] = { 23 , 59 , eeprom_read_byte( &eep.byte8[ALERT_HOUR_1 + ret] ) , eeprom_read_byte( &eep.byte8[ALERT_MINUTE_1 + ret] ) }; // Darf nicht verï¿½ndert werden..
 
 	if ( ret == 9 )
 	{
@@ -2040,13 +2045,13 @@ Anfang:
 
 	if ( alert.enable & 1<<ret )
 	{
-		strcpy( menueOnOff_struct[0].name , "On  §");
+		strcpy( menueOnOff_struct[0].name , "On  ï¿½");
 		strcpy( menueOnOff_struct[1].name , "Off %");
 	}
 	else
 	{
 		strcpy( menueOnOff_struct[0].name , "On  %");
-		strcpy( menueOnOff_struct[1].name , "Off §");
+		strcpy( menueOnOff_struct[1].name , "Off ï¿½");
 	}
 		
 	uint8_t choose	= 0;
@@ -2107,7 +2112,7 @@ Anfang:
 		return _MENUE_EXIT_;
 	}
 
-	uint8_t buff[] = { 23 , 59 , eeprom_read_byte( &eep.byte8[ DIMM_HOUR_ON + ret ]) , eeprom_read_byte( &eep.byte8[ DIMM_MINUTE_ON + ret ]) }; // Darf nicht verändert werden..
+	uint8_t buff[] = { 23 , 59 , eeprom_read_byte( &eep.byte8[ DIMM_HOUR_ON + ret ]) , eeprom_read_byte( &eep.byte8[ DIMM_MINUTE_ON + ret ]) }; // Darf nicht verï¿½ndert werden..
 	
 	uint8_t exit = 0;
 	exit = cnfgTime_( buff );
@@ -2141,7 +2146,7 @@ uint8_t menueAutoChange		( void )
 {
 	uint8_t ret = 0;
 	
-	uint8_t buff[] = { 59 , 59 , eeprom_read_byte( &eep.byte8[AUTO_CHANGE_MINUTE] ) , eeprom_read_byte( &eep.byte8[AUTO_CHANGE_SECOUND] ) }; // Darf nicht verändert werden..
+	uint8_t buff[] = { 59 , 59 , eeprom_read_byte( &eep.byte8[AUTO_CHANGE_MINUTE] ) , eeprom_read_byte( &eep.byte8[AUTO_CHANGE_SECOUND] ) }; // Darf nicht verï¿½ndert werden..
 	
 	ret = cnfgTime_( buff );
 	
@@ -2292,13 +2297,13 @@ uint8_t menueSound			( void )
 	
 	if ( enabled & 1<<0 )
 	{
-		strcpy( menueOnOff_struct[0].name , "On  §");
+		strcpy( menueOnOff_struct[0].name , "On  ï¿½");
 		strcpy( menueOnOff_struct[1].name , "Off %");
 	}
 	else
 	{
 		strcpy( menueOnOff_struct[0].name , "On  %");
-		strcpy( menueOnOff_struct[1].name , "Off §");
+		strcpy( menueOnOff_struct[1].name , "Off ï¿½");
 	}
 	
 	uint8_t ret	= 0;
@@ -2340,13 +2345,13 @@ uint8_t menueMotor			( void )
 	
 	if ( enabled & 1<<0 )
 	{
-		strcpy( menueOnOff_struct[0].name , "On  §");
+		strcpy( menueOnOff_struct[0].name , "On  ï¿½");
 		strcpy( menueOnOff_struct[1].name , "Off %");
 	}
 	else
 	{
 		strcpy( menueOnOff_struct[0].name , "On  %");
-		strcpy( menueOnOff_struct[1].name , "Off §");
+		strcpy( menueOnOff_struct[1].name , "Off ï¿½");
 	}
 	
 	uint8_t ret	= 0;
@@ -2533,7 +2538,7 @@ uint8_t menueBrightness		( void )
 
 		if ( index == lastSelected )
 		{
-			putChar('§',27);
+			putChar('ï¿½',27);
 		}
 		else
 		{
@@ -2767,26 +2772,26 @@ uint8_t menueDate			( void )
 int main( void )
 {		
 	/*	DCF77 Abgleich
-	*	Mit der Variable werden die verstrichenen Minuten gezählt 
-	*	bis zur nächsten Synchronisation
+	*	Mit der Variable werden die verstrichenen Minuten gezï¿½hlt 
+	*	bis zur nï¿½chsten Synchronisation
 	*/
 	uint8_t oldSyncTime = 0;
 	
-	/*	Ausgänge
-	*	Ausgänge konfigurieren
+	/*	Ausgï¿½nge
+	*	Ausgï¿½nge konfigurieren
 	*/
 	DDRD |= ((1<<PD1) | (1<<PD4) | (1<<PD5) | (1<<PD6) | (1<<PD7));
 	DDRC |= (1<<PC0);
 	DDRB |= ((1<<PB3) | (1<<PB4));
 	
-	/*	Eingänge / Ausgänge
-	*	Anfangszustände der Pins festlegen
+	/*	Eingï¿½nge / Ausgï¿½nge
+	*	Anfangszustï¿½nde der Pins festlegen
 	*/
 	PORTC |= ((1<<PC2) | (1<<PC3) | (1<<PC4) | (1<<PC5) | (1<<PC6));
 	PORTB |= (1<<PB2);
 	PORTD |= ((1<<PD5));
 	
-	/*	Eingänge des Matrix-Treibers festlegen
+	/*	Eingï¿½nge des Matrix-Treibers festlegen
 	*/
 	HT1632_CS_DDR	|= (1 << HT1632_CS_BP);
 	HT1632_CS_PORT	|= (1 << HT1632_CS_BP);
@@ -2797,7 +2802,7 @@ int main( void )
 		
 	/*	Timer 0 
 	*	Wird auf CompareMatch eingestellt
-	*	Auslöseintervall.: 10ms
+	*	Auslï¿½seintervall.: 10ms
 	*/
 	TCCR0	|= ((1<<CS02) | (1<<CS00) | (1<<WGM01)); // Prescaler : 1024 
 	TIMSK   |= ((1<<OCIE0) | (1<<OCIE2));
@@ -2805,7 +2810,7 @@ int main( void )
 	
 	/*	Timer 2 
 	*	Wird auf CompareMatch eingestellt
-	*	Auslöseintervall.: 1ms
+	*	Auslï¿½seintervall.: 1ms
 	*/
 	TCCR2  |= ((1<<CS22) | (1<<WGM21)); // Prescaler : 64
 	OCR2   = ((F_CPU / 64 / 1000 ) - 1 ); 
@@ -2855,8 +2860,8 @@ int main( void )
   	dcfNewData	= 0;
 			
 	/*	Tasten Entprellen
-	*	Sollte beim Systemstart eine Taste gedrückt wurden sein,
-	*	löschen wir diese nach main()
+	*	Sollte beim Systemstart eine Taste gedrï¿½ckt wurden sein,
+	*	lï¿½schen wir diese nach main()
 	*/
 	button.all = 0;
 	
@@ -2996,7 +3001,7 @@ int main( void )
 		}// end if
 				
 		/*	Zeitsynchronisation
-		*	Kann im "Menü" -> "Sync?" -> "-Cycl." eingestellt werden
+		*	Kann im "Menï¿½" -> "Sync?" -> "-Cycl." eingestellt werden
 		*	...
 		*/			
 		if ( ( sys.syncHourCntDCF77 >= ram.byte8[SYNC_HOUR] ) && ( sys.syncMinuteCntDCF77 >= ( ram.byte8[SYNC_MINUTE] ) ) )
@@ -3011,7 +3016,7 @@ int main( void )
 		}	
 		
 		/*
-		*	Zähler für die automatische Synchronisation
+		*	Zï¿½hler fï¿½r die automatische Synchronisation
 		*/
 		if (oldSyncTime != rx8564.minute )
 		{
